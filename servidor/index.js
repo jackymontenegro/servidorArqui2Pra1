@@ -13,9 +13,9 @@ app.use(express.json());
 
 var mysql1 = require('mysql');
 var mysqlConnection = mysql1.createConnection({
-  host: "127.0.0.1",
-  user: "jmontenegro",
-  password: "123456",
+  host: "34.68.38.115",
+  user: "arqui",
+  password: "arquipractica1",
   database: "mydb"
 
 });
