@@ -68,7 +68,7 @@ app.get('/ejemplo/', function(req, res){
 
     var usuario = req.body;
 
-    var sql = "insert into usuario (nombre,apellido, fechaNacimiento,sexo, peso,altura,tipo_idtipo,correo,contra,usuario_idusuario)  values ('"+usuario.firstname+"','"+usuario.lastname+"',STR_TO_DATE('"+usuario.birthdate+"','%Y/%m/%d'),'"+usuario.sex+"',"+usuario.weight+","+usuario.height+","+usuario.role+",'"+usuario.email+"','"+usuario.password+"',1);";
+    var sql = "insert into usuario (nombre,apellido, fechaNacimiento,sexo, peso,altura,tipo_idtipo,correo,contra,usuario_idusuario)  values ('"+usuario.firstname+"','"+usuario.lastname+"',STR_TO_DATE('"+usuario.birthdate.split('-').reverse().join('/')+"','%Y/%m/%d'),'"+usuario.sex+"',"+usuario.weight+","+usuario.height+","+usuario.role+",'"+usuario.email+"','"+usuario.password+"',1);";
     console.log(sql);
     mysqlConnection.query(sql,(err, rows,fields)=>{
       if(!err){
