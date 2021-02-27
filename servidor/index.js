@@ -14,13 +14,13 @@ app.use(express.json());
 var mysql1 = require('mysql');
 var mysqlConnection = mysql1.createConnection({
   host: "127.0.0.1",
- /* user: "arqui",
+  user: "arqui",
   password: "arquipractica1",
-  database: "mydb"*/
-
-  user: "jmontenegro",
-  password: "123456",
   database: "mydb"
+
+/*  user: "jmontenegro",
+  password: "123456",
+  database: "mydb"*/
 
 });
 
@@ -238,7 +238,7 @@ app.get('/ejemplo/', function(req, res){
 
         var temperatura = req.body;
     
-        var sql = "insert into temperatura (temperatura, usuario_idusuario,fecha) values ("+temperatura.temperatura+","+temperatura.idusuario+",STR_TO_DATE('"+temperatura.fecha+"','%d%m%Y %h%i%s'));";
+        var sql = "insert into temperatura (temperatura, usuario_idusuario,fecha) values ("+temperatura.temperatura+","+temperatura.idusuario+",STR_TO_DATE('"+temperatura.fecha+"','%d%m%Y %H%i%s'));";
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
           if(!err){
@@ -265,7 +265,7 @@ app.get('/ejemplo/', function(req, res){
 
       var ritmo = req.body;
   
-      var sql = "insert into ritmo (ritmo, usuario_idusuario,fecha) values ("+ritmo.ritmo+","+ritmo.idusuario+",STR_TO_DATE('"+ritmo.fecha+"','%d%m%Y %h%i%s'));";
+      var sql = "insert into ritmo (ritmo, usuario_idusuario,fecha) values ("+ritmo.ritmo+","+ritmo.idusuario+",STR_TO_DATE('"+ritmo.fecha+"','%d%m%Y %H%i%s'));";
       console.log(sql);
       mysqlConnection.query(sql,(err, rows,fields)=>{
         if(!err){
@@ -292,7 +292,7 @@ app.get('/ejemplo/', function(req, res){
 
     var oxigeno = req.body;
 
-    var sql = "insert into oxigeno (oxigeno, usuario_idusuario,fecha) values ("+oxigeno.oxigeno+","+oxigeno.idusuario+",STR_TO_DATE('"+oxigeno.fecha+"','%d%m%Y %h%i%s'));";
+    var sql = "insert into oxigeno (oxigeno, usuario_idusuario,fecha) values ("+oxigeno.oxigeno+","+oxigeno.idusuario+",STR_TO_DATE('"+oxigeno.fecha+"','%d%m%Y %H%i%s'));";
     console.log(sql);
     mysqlConnection.query(sql,(err, rows,fields)=>{
       if(!err){
