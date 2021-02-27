@@ -128,7 +128,7 @@ app.get('/ejemplo/', function(req, res){
     */
     var usuario = req.body;
 
-    var sql = "select b.status as status, b.nombre,b.apellido, b.fecha,b.sexo, b.peso,b.altura,b.tipo,b.correo,b.contra,c.nombre as entrenador from (select u.status as status,  u.nombre as nombre,u.apellido as apellido, cast(u.fechaNacimiento as date) as fecha,u.sexo as sexo,u.peso as peso,u.altura as altura,t.tipo as tipo,u.correo as correo , u.contra as contra, u.usuario_idusuario as entrenador from usuario as u, tipo as t  where u.tipo_idtipo = t.idtipo  and u.correo = '"+usuario.email+"' and u.contra = '"+usuario.password+"') as b, (select u.idusuario as id, u.nombre  as nombre from usuario as u  where u.tipo_idtipo = 1 ) as c  where b.entrenador = c.id;";
+    var sql = "select b.status as status, b.idusuario as idusuario, b.nombre,b.apellido, b.fecha,b.sexo, b.peso,b.altura,b.tipo,b.correo,b.contra,c.nombre as entrenador from (select u.status as status,u.idusuario as idusuario,  u.nombre as nombre,u.apellido as apellido, cast(u.fechaNacimiento as date) as fecha,u.sexo as sexo,u.peso as peso,u.altura as altura,t.tipo as tipo,u.correo as correo , u.contra as contra, u.usuario_idusuario as entrenador from usuario as u, tipo as t  where u.tipo_idtipo = t.idtipo  and u.correo = '"+usuario.email+"' and u.contra = '"+usuario.password+"') as b, (select u.idusuario as id, u.nombre  as nombre from usuario as u  where u.tipo_idtipo = 1 ) as c  where b.entrenador = c.id;";
     console.log(sql);
     mysqlConnection.query(sql,(err, rows,fields)=>{
       if(!err){
@@ -139,6 +139,7 @@ app.get('/ejemplo/', function(req, res){
         console.log('vacio');
         res.json( [{
           "status": "false",
+          "idusuario": 0,
           "nombre": "",
           "apellido": "",
           "fecha": "",
@@ -165,6 +166,7 @@ app.get('/ejemplo/', function(req, res){
         console.log(err);
         res.json( [{
         "status": "false",
+        "idusuario": 0,
         "nombre": "",
         "apellido": "",
         "fecha": "",
@@ -185,6 +187,7 @@ app.get('/ejemplo/', function(req, res){
         console.log(err);
         res.json( [{
           "status": "false",
+          "idusuario": 0,
           "nombre": "",
           "apellido": "",
           "fecha": "",
