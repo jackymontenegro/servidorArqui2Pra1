@@ -399,6 +399,30 @@ app.get('/ejemplo/', function(req, res){
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
 
+          if(Object.entries(rows).length === 0){
+
+            var arraytimes = [];
+            arraytimes.push('t1');
+            arraytimes.push('t2');
+            arraytimes.push('t3');
+        
+        
+            var arraymed = [];
+            arraymed.push(0);
+            arraymed.push(0);
+            arraymed.push(0);
+        
+        
+        
+            var array = [];
+            array.push(arraytimes);
+            array.push(arraymed);
+
+            res.json( array);
+          
+
+        }else{
+
           var arraytimes = [];
           var arraymed = [];
           var array = [];
@@ -428,6 +452,8 @@ app.get('/ejemplo/', function(req, res){
               console.log(err);
               res.json(array);
           }
+
+        }
         });
 
       }else if (parseInt(historial.tipo)== 2){
