@@ -639,7 +639,7 @@ app.get('/ejemplo/', function(req, res){
       if(parseInt(historial.tipo)== 1){
         //pulso
     
-        var sql = "select usuario_idusuario, avg(ritmo) from ritmo where usuario_idusuario = "+parseInt(historial.idusuario)+" group by usuario_idusuario;";
+        var sql = "select usuario_idusuario, avg(ritmo) as promedio from ritmo where usuario_idusuario = "+parseInt(historial.idusuario)+" group by usuario_idusuario;";
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
 
@@ -680,7 +680,7 @@ app.get('/ejemplo/', function(req, res){
         //oxigeno
       
         
-       var sql = "select usuario_idusuario, avg(oxigeno) from oxigeno where usuario_idusuario = "+parseInt(historial.idusuario)+" group by usuario_idusuario;";
+       var sql = "select usuario_idusuario, avg(oxigeno) as oxigeno from oxigeno where usuario_idusuario = "+parseInt(historial.idusuario)+" group by usuario_idusuario;";
        console.log(sql);
        mysqlConnection.query(sql,(err, rows,fields)=>{
         if(!err){
