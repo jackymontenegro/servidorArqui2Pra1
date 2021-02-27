@@ -14,13 +14,13 @@ app.use(express.json());
 var mysql1 = require('mysql');
 var mysqlConnection = mysql1.createConnection({
   host: "127.0.0.1",
-  user: "arqui",
+ /* user: "arqui",
   password: "arquipractica1",
-  database: "mydb"
-
-  /*user: "jmontenegro",
-  password: "123456",
   database: "mydb"*/
+
+  user: "jmontenegro",
+  password: "123456",
+  database: "mydb"
 
 });
 
