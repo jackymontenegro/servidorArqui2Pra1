@@ -14,13 +14,13 @@ app.use(express.json());
 var mysql1 = require('mysql');
 var mysqlConnection = mysql1.createConnection({
   host: "127.0.0.1",
-  user: "arqui",
+  /*user: "arqui",
   password: "arquipractica1",
-  database: "mydb"
-
-/*  user: "jmontenegro",
-  password: "123456",
   database: "mydb"*/
+
+  user: "jmontenegro",
+  password: "123456",
+  database: "mydb"
 
 });
 
@@ -309,6 +309,8 @@ app.get('/ejemplo/', function(req, res){
   }
     });
 }); 
+
+ 
 
     app.get('/visualizarEntrenadores/', function(req, res){
 
@@ -708,9 +710,9 @@ app.get('/ejemplo/', function(req, res){
     app.get('/usuarioLogueado/', function (req, res) {
 
       //http://localhost:3000/temperaturaPro/?idusuario=2
-  
+      //var sql = "update usuario set activo = 0 where idusuario = "+parseInt(idusuario)+";";
 
-      var sql = "select idusuario from usuario where activo = 1;";
+      var sql = " select idusuario from usuario where activo = 1; ";
       console.log(sql);
       mysqlConnection.query(sql,(err, rows,fields)=>{
         if(!err){
@@ -729,6 +731,510 @@ app.get('/ejemplo/', function(req, res){
   app.listen(5000, () => {
     console.log("El servidor está inicializado en el puerto 3000");
    });
+
+   app.post('/inicioEntrenamiento/', function(req, res){
+
+    /*
+        {
+        "idusuario": 2
+        }
+      */   
+  
+    var usuario = req.body;
+  
+    var sql = "insert into entrenamiento (usuario_idusuario) values ("+usuario.idusuario+"); ";
+    console.log(sql);
+    mysqlConnection.query(sql,(err, rows,fields)=>{
+      if(!err){
+      console.log(rows.nombre);
+     // res.json( [{"status":1}] );
+  
+      var sql1 = "insert into repeticion (numero, entrenamiento_identrenamiento)  select 1, identrenamiento   from entrenamiento  order by identrenamiento desc  limit 1;;";
+      console.log(sql1);
+      mysqlConnection.query(sql1,(err, rows,fields)=>{
+        if(!err){
+        console.log(rows.nombre);
+        res.json( [{"status":1}] );
+  
+        
+    
+        
+      }else{
+          console.log(err);
+          res.json( [{"status":0}] );
+    }
+      });
+
+  
+      
+    }else{
+        console.log(err);
+        res.json( [{"status":0}] );
+  }
+    });
+  }); 
+  
+
+  app.post('/completarRepeticion/', function(req, res){
+
+    /*
+        {
+        "idusuario": 2,
+        "numeroRepeticion": 2,   #el numero de repeticion que comenzara
+        "distancia": 5.1,        #la distancia de la repeticion que acaba de finalizar
+        "fecha": "01012013 113010"    
+        }
+      */   
+  
+    var entrenamiento = req.body;
+  
+    var sql = " update repeticion as re, (select  idrepeticion as ultimoid from repeticion order by idrepeticion desc limit 1) as ure  set re.distanciaTotal = "+entrenamiento.distancia+", re.fechadistancia = STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s')  where re.idrepeticion = ure.ultimoid;"; 
+    console.log(sql);
+    mysqlConnection.query(sql,(err, rows,fields)=>{
+      if(!err){
+      console.log(rows.nombre);
+     // res.json( [{"status":1}] );
+  
+      var sql1 = "insert into repeticion (numero, entrenamiento_identrenamiento)  select "+entrenamiento.numeroRepeticion+", identrenamiento   from entrenamiento  order by identrenamiento desc  limit 1;";
+      console.log(sql1);
+      mysqlConnection.query(sql1,(err, rows,fields)=>{
+        if(!err){
+        console.log(rows.nombre);
+        res.json( [{"status":1}] );
+  
+        
+    
+        
+      }else{
+          console.log(err);
+          res.json( [{"status":0}] );
+    }
+      });
+
+  
+      
+    }else{
+        console.log(err);
+        res.json( [{"status":0}] );
+  }
+    });
+  }); 
+
+
+  app.post('/finalizarEntrenamiento/', function(req, res){
+
+    /*
+        #hay tres formas de terminar el entrenamiento:
+            1 = fallo
+            2 = rendirse
+            3 = completo el entrenamiento 
+        {
+        "idusuario": 2,
+        "distancia": 5.1,        #la distancia de la repeticion que acaba de finalizar
+        "fecha": "01012013 113010" 
+        "tipo" : 1   
+        }
+      */   
+  
+    var entrenamiento = req.body;
+
+    if(parseInt(entrenamiento.tipo)== 1){ //fallo
+
+      var sql = "update repeticion as re, (select  idrepeticion as ultimoid  from repeticion  order by idrepeticion desc  limit 1) as ure set re.distanciaTotal = "+entrenamiento.distancia+", re.fechadistancia = STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'), re.fallo = 1  where re.idrepeticion = ure.ultimoid;"; 
+    console.log(sql);
+    mysqlConnection.query(sql,(err, rows,fields)=>{
+      if(!err){
+      console.log(rows.nombre);
+     // res.json( [{"status":1}] );
+  
+      var sql1 = " update entrenamiento as re, (select  numero as ultimo   from repeticion  order by idrepeticion desc  limit 1) as ure, (select identrenamiento as ultimoid  from entrenamiento  order by identrenamiento desc  limit 1) as uen   set re.repeticion = ure.ultimo, re.fecha = STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'), re.estado = 1  where re.identrenamiento = uen.ultimoid;";
+      console.log(sql1);
+      mysqlConnection.query(sql1,(err, rows,fields)=>{
+        if(!err){
+        console.log(rows.nombre);
+        res.json( [{"status":1}] );
+  
+        
+    
+        
+      }else{
+          console.log(err);
+          res.json( [{"status":0}] );
+    }
+      });
+
+  
+      
+    }else{
+        console.log(err);
+        res.json( [{"status":0}] );
+  }
+    });
+
+    }else if(parseInt(entrenamiento.tipo)== 2){//rendirse
+
+      var sql = "update repeticion as re, (select  idrepeticion as ultimoid  from repeticion  order by idrepeticion desc  limit 1) as ure set re.distanciaTotal = "+entrenamiento.distancia+", re.fechadistancia = STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'), re.rendir = 1  where re.idrepeticion = ure.ultimoid;"; 
+    console.log(sql);
+    mysqlConnection.query(sql,(err, rows,fields)=>{
+      if(!err){
+      console.log(rows.nombre);
+     // res.json( [{"status":1}] );
+  
+      var sql1 = " update entrenamiento as re, (select  numero as ultimo   from repeticion  order by idrepeticion desc  limit 1) as ure, (select identrenamiento as ultimoid  from entrenamiento  order by identrenamiento desc  limit 1) as uen   set re.repeticion = ure.ultimo, re.fecha = STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'), re.estado = 2  where re.identrenamiento = uen.ultimoid;";
+      console.log(sql1);
+      mysqlConnection.query(sql1,(err, rows,fields)=>{
+        if(!err){
+        console.log(rows.nombre);
+        res.json( [{"status":1}] );
+  
+        
+    
+        
+      }else{
+          console.log(err);
+          res.json( [{"status":0}] );
+    }
+      });
+
+  
+      
+    }else{
+        console.log(err);
+        res.json( [{"status":0}] );
+  }
+    });
+
+    }else if(parseInt(entrenamiento.tipo)== 3){//completo entrenamiento
+
+
+    var sql = " update repeticion as re, (select  idrepeticion as ultimoid from repeticion order by idrepeticion desc limit 1) as ure  set re.distanciaTotal = "+entrenamiento.distancia+", re.fechadistancia = STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s')  where re.idrepeticion = ure.ultimoid;"; 
+    console.log(sql);
+    mysqlConnection.query(sql,(err, rows,fields)=>{
+      if(!err){
+      console.log(rows.nombre);
+     // res.json( [{"status":1}] );
+  
+     var sql = "update entrenamiento as re, (select  numero as ultimo from repeticion  order by idrepeticion desc  limit 1) as ure, (select identrenamiento as ultimoid   from entrenamiento  order by identrenamiento desc  limit 1) as uen   set re.repeticion = ure.ultimo, re.fecha = STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'), re.estado = 3   where re.identrenamiento = uen.ultimoid;";
+      console.log(sql1);
+      mysqlConnection.query(sql1,(err, rows,fields)=>{
+        if(!err){
+        console.log(rows.nombre);
+        res.json( [{"status":1}] );
+  
+        
+    
+        
+      }else{
+          console.log(err);
+          res.json( [{"status":0}] );
+    }
+      });
+
+  
+      
+    }else{
+        console.log(err);
+        res.json( [{"status":0}] );
+  }
+    });
+
+      
+
+    }
+  
+    
+  }); 
+
+  app.post('/velocidad/', function(req, res){
+
+    /*
+      {
+      "idusuario": 2,
+      "fecha": "26/02/2021",
+      "velocidad": 2
+      }
+      */   
+
+    var velocidad = req.body;
+
+    var sql = "insert into velocidad (velocidad,fecha, repeticion_idrepeticion) select "+velocidad.velocidad+",STR_TO_DATE('"+velocidad.fecha+"','%d%m%Y %H%i%s'), idrepeticion from repeticion order by idrepeticion desc limit 1;";
+    console.log(sql);
+    mysqlConnection.query(sql,(err, rows,fields)=>{
+      if(!err){
+      console.log(rows.nombre);
+      res.json( [{"status":1}] );
+
+      
+    }else{
+        console.log(err);
+        res.json( [{"status":0}] );
+  }
+    });
+}); 
+
+  app.post('/conteoxrepeticiones/', function(req, res){
+
+    /*
+      {
+      "idusuario": 2
+      }
+      */
+  
+    var usuario = req.body;
+
+      var sql = "select en.identrenamiento as identrenamiento, en.usuario_idusuario as idusuario, en.repeticion as repeticion, en.estado as estado, en.fecha as fecha  from entrenamiento as en  where  en.usuario_idusuario ="+usuario.idusuario+"; ";
+      console.log(sql);
+      mysqlConnection.query(sql,(err, rows,fields)=>{
+        if(!err){
+        console.log(rows.nombre);
+        res.json( rows);
+  
+        
+      }else{
+          console.log(err);
+          res.json( [{
+            "identrenamiento": 0,
+            "idusuario": 0,
+            "repeticion": 0,
+            "estado": "",
+            "fecha": ""}] );
+    }
+      });
+  });
+
+  app.post('/repeticionesxsemana/', function(req, res){
+
+    /*
+      {
+      "idusuario": 2,
+      "fechaInicial" : "",
+      "fechaFinal" :""
+      }
+      */
+  
+    var usuario = req.body;
+
+      var sql = "select avg(en.repeticion) as promedioRepeticion, max(en.repeticion) as maximoRepeticion, min(en.repeticion) as minimoRepeticion, en.fecha as fecha  from entrenamiento as en where  en.usuario_idusuario = "+usuario.idusuario+"  and cast(en.fecha as date) BETWEEN STR_TO_DATE('"+usuario.fechaInicial.split('-').reverse().join('/')+"','%d/%m/%Y') AND STR_TO_DATE('"+usuario.fechaFinal.split('-').reverse().join('/')+"','%d/%m/%Y')  group by en.fecha ;";
+      console.log(sql);
+      mysqlConnection.query(sql,(err, rows,fields)=>{
+        if(!err){
+        console.log(rows.nombre);
+        res.json( rows);
+  
+        
+      }else{
+          console.log(err);
+          res.json( [{
+            "promedioRepeticion": 0,
+            "maximoRepeticion": 0,
+            "minimoRepeticion": 0,
+            "fecha": ""}] );
+    }
+      });
+  });
+
+
+  app.post('/detallexentrenamiento/', function(req, res){
+
+    /*
+      {
+      "idusuario": 2,
+      "fechaInicial" : "",
+      "fechaFinal" :""
+      }
+      */
+  
+    var usuario = req.body;
+
+      var sql = "select re.idrepeticion as idrepeticion, avg(ve.velocidad) as promedioVelocidad,min(ve.velocidad) as minimaVelocidad,max(ve.velocidad) as maximaVelocidad, re.distanciaTotal as distanciaTotal  from entrenamiento as en, repeticion as re, velocidad as ve   where en.identrenamiento = re.entrenamiento_identrenamiento  and re.idrepeticion = ve.repeticion_idrepeticion  and en.identrenamiento = "+usuario.identrenamiento +"  group by re.idrepeticion,re.distanciaTotal;";  
+      console.log(sql);
+      mysqlConnection.query(sql,(err, rows,fields)=>{
+        if(!err){
+        console.log(rows.nombre);
+        res.json( rows);
+  
+        
+      }else{
+          console.log(err);
+          res.json( [{
+            "idrepeticion": 0,
+            "promedioVelocidad": 0,
+            "minimaVelocidad": 0,
+            "maximaVelocidad": 0,
+            "distanciaTotal": 0}] );
+    }
+      });
+  });
+
+
+  app.post('/conteoxentrenamiento/', function(req, res){
+
+    /*#es un listado de los entrenamientos donde fallo, rindio, completo
+        #hay 3 tipos de conteo
+        1 =  fallo
+        2 = rendicion
+        3 = completo
+      {
+      "idusuario": 2,
+      "estado" : 1
+      }
+      */
+  
+    var usuario = req.body;
+
+      var sql = "select en.identrenamiento as identrenamiento,  en.repeticion as repeticion, en.estado as estado from entrenamiento as en  where  en.usuario_idusuario = "+usuario.idusuario+"  and en.estado = "+usuario.estado+"; ";  
+      console.log(sql);
+      mysqlConnection.query(sql,(err, rows,fields)=>{
+        if(!err){
+        console.log(rows.nombre);
+        res.json( rows);
+  
+        
+      }else{
+          console.log(err);
+          res.json( [{
+            "identrenamiento": 0,
+            "repeticion": 0,
+            "estado": 0}] );
+    }
+      });
+  });
+
+
+  app.post('/totalxentrenamiento/', function(req, res){
+
+    /*#es un total de los entrenamientos que fallo rindio o completo
+        #hay 3 tipos de conteo
+        1 =  fallo
+        2 = rendicion
+        3 = completo
+      {
+      "idusuario": 2,
+      "estado" : 1
+      }
+      */
+  
+    var usuario = req.body;
+
+      var sql = "select count(en.identrenamiento) as total  from entrenamiento as en  where  en.usuario_idusuario = "+usuario.idusuario+"  and en.estado = "+usuario.estado+"; ";  
+      console.log(sql);
+      mysqlConnection.query(sql,(err, rows,fields)=>{
+        if(!err){
+        console.log(rows.nombre);
+        res.json( rows);
+  
+        
+      }else{
+          console.log(err);
+          res.json( [{
+            "total": 0}] );
+    }
+      });
+  });
+
+
+  app.post('/velocidadTR/', function(req, res){ //velocidad en tiempo real
+
+    /*
+      {
+      "idusuario": 2
+      }
+      */
+  
+    var usuario = req.body;
+
+      var sql = "select b.idvelocidad as idvelocidad, b.velocidad as velocidad,b.fecha as fecha from (select ve.idvelocidad, ve.velocidad as velocidad, CAST(ve.fecha AS TIME) as fecha   from entrenamiento as en, repeticion as re, velocidad as ve  where en.identrenamiento = re.entrenamiento_identrenamiento  and re.idrepeticion = ve.repeticion_idrepeticion  and en.usuario_idusuario = "+usuario.idusuario+"  order by ve.idvelocidad desc  limit 10) as b   order by b.idvelocidad asc;";
+      console.log(sql);
+      mysqlConnection.query(sql,(err, rows,fields)=>{
+        if(!err){
+        console.log(rows.nombre);
+        res.json( rows);
+  
+        
+      }else{
+          console.log(err);
+          res.json( [{
+            "idvelocidad": 0,
+            "velocidad": 0,
+            "fecha": ""}] );
+    }
+      });
+  });
+
+
+  app.post('/distancia/', function(req, res){ 
+
+    /*
+      #trae dos tipos de distancia
+      1  = lista de distancias por repeticion
+      2 = total de distancia por entrenamiento
+      {
+      "identrenamiento": 2,
+      "tipo" : 1
+      }
+      */
+  
+    var usuario = req.body;
+
+    if(parseInt(entrenamiento.tipo)== 1){ 
+
+      var sql = "select re.idrepeticion as idrepeticion, re.distanciaTotal as distanciaTotal  from entrenamiento as en, repeticion as re  where en.identrenamiento = re.entrenamiento_identrenamiento  and en.identrenamiento = "+usuario.identrenamiento+"  group by re.idrepeticion,re.distanciaTotal;";
+      console.log(sql);
+      mysqlConnection.query(sql,(err, rows,fields)=>{
+        if(!err){
+        console.log(rows.nombre);
+        res.json( rows);
+  
+        
+      }else{
+          console.log(err);
+          res.json( [{
+            "idrepeticion": 0,
+            "distanciaTotal": 0}] );
+    }
+      });
+
+    } else if(parseInt(entrenamiento.tipo)== 2){ 
+
+      var sql = "select en.identrenamiento as identrenamiento, sum(re.distanciaTotal ) as distanciaEntremiento  from entrenamiento as en, repeticion as re  where en.identrenamiento = re.entrenamiento_identrenamiento and en.identrenamiento = "+usuario.identrenamiento+"  group by en.identrenamiento;  ";
+      console.log(sql);
+      mysqlConnection.query(sql,(err, rows,fields)=>{
+        if(!err){
+        console.log(rows.nombre);
+        res.json( rows);
+  
+        
+      }else{
+          console.log(err);
+          res.json( [{
+            "idrepeticion": 0,
+            "distanciaEntremiento": 0}] );
+    }
+      });
+
+    }
+
+      
+  });
+
+  app.get('/repeticionActual/', function(req, res){ //las repeticion en la que va el usuario
+
+
+      var sql = "select  numero as repeticionactual  from repeticion  order by idrepeticion desc  limit 1;";
+      console.log(sql);
+      mysqlConnection.query(sql,(err, rows,fields)=>{
+        if(!err){
+        console.log(rows.nombre);
+        res.json( rows);
+  
+        
+      }else{
+          console.log(err);
+          res.json( [{
+            "repeticionactual": 0}] );
+    }
+      });
+  });
 
 
    /*
