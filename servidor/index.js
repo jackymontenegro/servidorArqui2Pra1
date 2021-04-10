@@ -777,6 +777,20 @@ app.get('/ejemplo2/', function(req, res){
       */   
   
     var entrenamiento = req.body;
+        var fe = entrenamiento.fecha;
+        var sfe = fe.split(" ");
+        var sh = sfe[1].split("");
+        var corregido =fe ;
+
+        if(parseInt( sh[0]) > 1){
+          console.log("es hora de 1 a 9 = 0"+sh[0]);
+      corregido = sfe[0]+" 0"+sfe[1]
+          console.log(corregido);
+        }else{
+          console.log("es hora de 10 a 24 = "+sh[0]+sh[1])
+        }
+
+    console.log(corregido);
 
     if(parseInt(entrenamiento.estado)== 1){//inicio entrenamiento: se crea entrenamiento
 
@@ -808,7 +822,7 @@ app.get('/ejemplo2/', function(req, res){
 
       if(parseInt(entrenamiento.numeroRepeticion)== 22){//completo entrenamiento
     
-        var sql = "update entrenamiento as re, (select  numero as ultimo from repeticion  order by idrepeticion desc  limit 1) as ure, (select identrenamiento as ultimoid   from entrenamiento  order by identrenamiento desc  limit 1) as uen   set re.repeticion = ure.ultimo, re.fecha = STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'), re.estado = 3   where re.identrenamiento = uen.ultimoid;";
+        var sql = "update entrenamiento as re, (select  numero as ultimo from repeticion  order by idrepeticion desc  limit 1) as ure, (select identrenamiento as ultimoid   from entrenamiento  order by identrenamiento desc  limit 1) as uen   set re.repeticion = ure.ultimo, re.fecha = STR_TO_DATE('"+corregido+"','%d%m%Y %H%i%s'), re.estado = 3   where re.identrenamiento = uen.ultimoid;";
         console.log(sql1);
         mysqlConnection.query(sql1,(err, rows,fields)=>{
           if(!err){
@@ -821,14 +835,14 @@ app.get('/ejemplo2/', function(req, res){
         });         
     
       }else{
-
+        console.log("entra");
         var sql = "select latitud, longitud from repeticion where entrenamiento_identrenamiento = (select identrenamiento from entrenamiento order by identrenamiento desc limit 1) and numero not like 0 order by idrepeticion desc  limit 1;";
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
           if(!err){
-
+            console.log("entra");
             if(Object.entries(rows).length === 0){
-              var sql1 = "insert into repeticion (numero, entrenamiento_identrenamiento,longitud,latitud,fechadistancia)  select "+entrenamiento.numeroRepeticion+", identrenamiento,"+entrenamiento.longitud+","+entrenamiento.latitud+",STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s')  from entrenamiento  order by identrenamiento desc  limit 1;";
+              var sql1 = "insert into repeticion (numero, entrenamiento_identrenamiento,longitud,latitud,fechadistancia)  select "+entrenamiento.numeroRepeticion+", identrenamiento,"+entrenamiento.longitud+","+entrenamiento.latitud+",STR_TO_DATE('"+corregido+"','%d%m%Y %H%i%s')  from entrenamiento  order by identrenamiento desc  limit 1;";
               console.log(sql1);
               mysqlConnection.query(sql1,(err, rows,fields)=>{
                 if(!err){
@@ -854,7 +868,7 @@ app.get('/ejemplo2/', function(req, res){
               console.log(distanciaM);
               console.log(velocidadM);
 
-              var sql1 = "insert into repeticion (numero, entrenamiento_identrenamiento,longitud,latitud,distanciaTotal, velocidad,fechadistancia)  select "+entrenamiento.numeroRepeticion+", identrenamiento,"+entrenamiento.longitud+","+entrenamiento.latitud+","+distanciaM+","+velocidadM+",STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s')     from entrenamiento  order by identrenamiento desc  limit 1;";
+              var sql1 = "insert into repeticion (numero, entrenamiento_identrenamiento,longitud,latitud,distanciaTotal, velocidad,fechadistancia)  select "+entrenamiento.numeroRepeticion+", identrenamiento,"+entrenamiento.longitud+","+entrenamiento.latitud+","+distanciaM+","+velocidadM+",STR_TO_DATE('"+corregido+"','%d%m%Y %H%i%s')     from entrenamiento  order by identrenamiento desc  limit 1;";
               console.log(sql1);
               mysqlConnection.query(sql1,(err, rows,fields)=>{
                 if(!err){
@@ -879,7 +893,7 @@ app.get('/ejemplo2/', function(req, res){
 
     }else if(parseInt(entrenamiento.estado)== 2){//fallo
   
-      var sql1 = " update entrenamiento as re, (select  numero as ultimo   from repeticion  order by idrepeticion desc  limit 1) as ure, (select identrenamiento as ultimoid  from entrenamiento  order by identrenamiento desc  limit 1) as uen   set re.repeticion = ure.ultimo, re.fecha = STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'), re.estado = 1  where re.identrenamiento = uen.ultimoid;";
+      var sql1 = " update entrenamiento as re, (select  numero as ultimo   from repeticion  order by idrepeticion desc  limit 1) as ure, (select identrenamiento as ultimoid  from entrenamiento  order by identrenamiento desc  limit 1) as uen   set re.repeticion = ure.ultimo, re.fecha = STR_TO_DATE('"+corregido+"','%d%m%Y %H%i%s'), re.estado = 1  where re.identrenamiento = uen.ultimoid;";
       console.log(sql1);
       mysqlConnection.query(sql1,(err, rows,fields)=>{
         if(!err){
@@ -893,7 +907,7 @@ app.get('/ejemplo2/', function(req, res){
 
     }else if(parseInt(entrenamiento.estado)== 3){//rendirse
 
-      var sql1 = " update entrenamiento as re, (select  numero as ultimo   from repeticion  order by idrepeticion desc  limit 1) as ure, (select identrenamiento as ultimoid  from entrenamiento  order by identrenamiento desc  limit 1) as uen   set re.repeticion = ure.ultimo, re.fecha = STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'), re.estado = 2  where re.identrenamiento = uen.ultimoid;";
+      var sql1 = " update entrenamiento as re, (select  numero as ultimo   from repeticion  order by idrepeticion desc  limit 1) as ure, (select identrenamiento as ultimoid  from entrenamiento  order by identrenamiento desc  limit 1) as uen   set re.repeticion = ure.ultimo, re.fecha = STR_TO_DATE('"+corregido+"','%d%m%Y %H%i%s'), re.estado = 2  where re.identrenamiento = uen.ultimoid;";
       console.log(sql1);
       mysqlConnection.query(sql1,(err, rows,fields)=>{
         if(!err){
@@ -907,7 +921,7 @@ app.get('/ejemplo2/', function(req, res){
       
     } else if(parseInt(entrenamiento.estado)== 4){//entrenamiento completado
     
-      var sql = "update entrenamiento as re, (select  numero as ultimo from repeticion  order by idrepeticion desc  limit 1) as ure, (select identrenamiento as ultimoid   from entrenamiento  order by identrenamiento desc  limit 1) as uen   set re.repeticion = ure.ultimo, re.fecha = STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'), re.estado = 3   where re.identrenamiento = uen.ultimoid;";
+      var sql = "update entrenamiento as re, (select  numero as ultimo from repeticion  order by idrepeticion desc  limit 1) as ure, (select identrenamiento as ultimoid   from entrenamiento  order by identrenamiento desc  limit 1) as uen   set re.repeticion = ure.ultimo, re.fecha = STR_TO_DATE('"+corregido+"','%d%m%Y %H%i%s'), re.estado = 3   where re.identrenamiento = uen.ultimoid;";
         console.log(sql1);
         mysqlConnection.query(sql1,(err, rows,fields)=>{
           if(!err){
