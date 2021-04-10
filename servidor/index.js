@@ -1168,7 +1168,7 @@ app.post('/RitmoCardiacoTR/', function (req, res) {//solo ritmo cardiaco en tiem
 
 });
 
-app.get('/distanciaTR/', function(req, res){ //la distancia en tiempo real
+app.post('/distanciaTR/', function(req, res){ //la distancia en tiempo real
 
 
   var sql = "select a.distancia as distancia, a.hora as fecha from (select  distanciaTotal as distancia , idrepeticion, cast(fechadistancia as time) as hora from repeticion where distanciaTotal is not null order by idrepeticion desc  limit 10) as a order by a.idrepeticion asc;";
