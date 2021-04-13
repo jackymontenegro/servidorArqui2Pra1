@@ -1101,6 +1101,35 @@ app.get('/ejemplo2/', function(req, res){
       });
   });
 
+app.post('/totalesx/', function(req, res){
+
+    /*
+      {
+      "idusuario": 2
+      }
+      */
+  
+    var usuario = req.body;
+
+      var sql = " select f.total as fallo, r.total as rendir, c.total as completo from (select count(en.identrenamiento) as total  from entrenamiento as en  where  en.usuario_idusuario = "+usuario.idusuario+"  and en.estado = 1) as f , (select count(en.identrenamiento) as total  from entrenamiento as en  where  en.usuario_idusuario = "+usuario.idusuario+"  and en.estado = 2) as r, (select count(en.identrenamiento) as total  from entrenamiento as en  where  en.usuario_idusuario = "+usuario.idusuario+"  and en.estado = 3) as c;";  
+      //var sql = "select count(en.identrenamiento) as total  from entrenamiento as en  where  en.usuario_idusuario = "+usuario.idusuario+"  and en.estado = "+usuario.estado+"; ";  
+      console.log(sql);
+      mysqlConnection.query(sql,(err, rows,fields)=>{
+        if(!err){
+        console.log(rows.nombre);
+        res.json( rows);
+  
+        
+      }else{
+          console.log(err);
+          res.json( [{
+            "fallo": 0,
+          "rendir": 0,
+          "completo": 0}] );
+    }
+      });
+  });
+
 
   app.get('/repeticionActual/', function(req, res){ //las repeticion en la que va el usuario
 
