@@ -950,7 +950,7 @@ app.get('/ejemplo2/', function(req, res){
   
     var usuario = req.body;
 
-      var sql = "select en.identrenamiento as identrenamiento, en.usuario_idusuario as idusuario, en.repeticion as repeticion, en.estado as estado, en.fecha as fecha  from entrenamiento as en  where  en.usuario_idusuario ="+usuario.idusuario+"; ";
+      var sql = "select en.identrenamiento as identrenamiento, en.usuario_idusuario as idusuario, en.repeticion as repeticion, en.estado as estado, en.fecha as fecha  from entrenamiento as en  where  en.usuario_idusuario ="+usuario.idusuario+" and en.fecha is not null; ";
       console.log(sql);
       mysqlConnection.query(sql,(err, rows,fields)=>{
         if(!err){
