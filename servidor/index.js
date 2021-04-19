@@ -1537,7 +1537,7 @@ function calculator(la1,lo1,la2,lo2) {
   
       }else if(parseInt(entrenamiento.estado)== 3){//finalizar
     
-        var sql1 = " update entrenamiento as re, (select  periodo as ultimo   from volumen  order by idvolumen desc  limit 1) as ure, (select identrenamiento as ultimoid  from entrenamiento  order by identrenamiento desc  limit 1) as uen   set re.repeticion = ure.ultimo, re.fecha = STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'), re.estado = 3  where re.identrenamiento = uen.ultimoid;";
+        var sql1 = " update entrenamiento as re, (select  periodo as ultimo   from volumen  order by idvolumen desc  limit 1) as ure, (select identrenamiento as ultimoid  from entrenamiento  order by identrenamiento desc  limit 1) as uen   set re.repeticion = ure.ultimo, re.fecha = STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'), re.estado = 4  where re.identrenamiento = uen.ultimoid;";
         console.log(sql1);
         mysqlConnection.query(sql1,(err, rows,fields)=>{
           if(!err){
@@ -1688,6 +1688,37 @@ function calculator(la1,lo1,la2,lo2) {
             res.json( [{
               "identrenamiento": 0,
               "vo2MAX": 0}] );
+      }
+        });
+    });
+
+    app.post('/intentosDetalle/', function(req, res){/*conteo de repeticiones "se deberán listar todos los entrenamientos y cuantas repeticiones logró hacer en cada
+    uno de ellos, si falló o si aprobó también deberá ser mostrado."*/
+  
+      /*
+        {
+        "idusuario": 2
+        }
+        */
+    
+      var usuario = req.body;
+  
+        var sql = "select en.identrenamiento as identrenamiento, en.usuario_idusuario as idusuario, en.repeticion as repeticion, en.estado as estado, en.fecha as fecha  from entrenamiento as en  where  en.usuario_idusuario ="+usuario.idusuario+" and en.estado = 4 and en.fecha is not null; ";
+        console.log(sql);
+        mysqlConnection.query(sql,(err, rows,fields)=>{
+          if(!err){
+          console.log(rows.nombre);
+          res.json( rows);
+    
+          
+        }else{
+            console.log(err);
+            res.json( [{
+              "identrenamiento": 0,
+              "idusuario": 0,
+              "repeticion": 0,
+              "estado": "",
+              "fecha": ""}] );
       }
         });
     });
