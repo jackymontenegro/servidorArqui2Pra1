@@ -77,7 +77,7 @@ app.get('/ejemplo/', function(req, res){
 
     var usuario = req.body;
 
-    var sql = "insert into usuario (nombre,apellido, fechaNacimiento,sexo, peso,altura,tipo_idtipo,correo,contra,usuario_idusuario)  values ('"+usuario.firstname+"','"+usuario.lastname+"',STR_TO_DATE('"+usuario.birthdate.split('-').reverse().join('/')+"','%d/%m/%Y'),'"+usuario.sex+"',"+usuario.weight+","+usuario.height+","+usuario.role+",'"+usuario.email+"','"+usuario.password+"',1);";
+    var sql = "insert into usuario (nombre,apellido, fechaNacimiento,sexo, peso,altura,tipo_idtipo,correo,contra,usuario_idusuario)  values ('"+usuario.firstname+"','"+usuario.lastname+"',STR_TO_DATE('"+usuario.birthdate.split('-').reverse().join('/')+"','%d/%m/%Y'),'"+usuario.sex+"',"+usuario.weight+","+usuario.height+",2,'"+usuario.email+"','"+usuario.password+"',1);";
     console.log(sql);
     mysqlConnection.query(sql,(err, rows,fields)=>{
       if(!err){
@@ -97,7 +97,6 @@ app.get('/ejemplo/', function(req, res){
       "sex":"h",
       "weight":"110",
       "height":"1.50",
-      "role":"2",
       "email":"test@correo.com",
       "password":"test"
       }
@@ -1426,9 +1425,89 @@ function calculator(la1,lo1,la2,lo2) {
 
     /***************************************************************************************************************** */
         /***************************************************************************************************************** */
+/*****************APLICACION MOVIL***************** */
+
+        app.post('/medidaVo/', function(req, res){ // entrenamiento
+
+          /*estado= 
+          1(inicia prueba)
+          2(en prueba)
+          3(finaliza prueba)
+              {
+              "idusuario": 2,
+              "estado": 2,
+              "volumen": 5.1,
+              "periodo": 1,        
+              "fecha": "01012013 113010"
+              }
+            */   
+        
+          var entrenamiento = req.body;
+      
+          if(parseInt(entrenamiento.estado)== 1){//inicia prueba
+      
+            var sql = "insert into entrenamiento (usuario_idusuario) values ("+entrenamiento.idusuario+"); ";
+            console.log(sql);
+            mysqlConnection.query(sql,(err, rows,fields)=>{
+              if(!err){
+                console.log(rows.nombre);
+                //res.json( [{"status":1}] );  
+                var sql1 = "insert into volumen (volumen,periodo,fecha, entrenamiento_identrenamiento)  select "+entrenamiento.volumen+", "+entrenamiento.periodo+",STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'), identrenamiento   from entrenamiento  order by identrenamiento desc  limit 1;;";
+                console.log(sql1);
+                mysqlConnection.query(sql1,(err, rows,fields)=>{
+                  if(!err){
+                    console.log(rows.nombre);
+                    res.json( [{"status":1}] );
+                  }else{
+                    console.log(err);
+                    res.json( [{"status":0}] );
+                  }
+                });
+                
+              }else{
+                  console.log(err);
+                  res.json( [{"status":0}] );
+              }
+            });
+      
+          }else if(parseInt(entrenamiento.estado)== 2){// en prueba
+      
+          
+            var sql1 = "insert into volumen (volumen, entrenamiento_identrenamiento,periodo,fecha)  select "+entrenamiento.volumen+", identrenamiento,"+entrenamiento.periodo+",STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s')     from entrenamiento  order by identrenamiento desc  limit 1;";
+            console.log(sql1);
+            mysqlConnection.query(sql1,(err, rows,fields)=>{
+              if(!err){
+                console.log(rows.nombre);
+                res.json( [{"status":1}] );
+              
+              }else{
+                console.log(err);
+                res.json( [{"status":0}] );
+              }
+            });
+      
+          }else if(parseInt(entrenamiento.estado)== 3){//finalizar
+        
+            var sql1 = " update entrenamiento as re, (select  periodo as ultimo   from volumen  order by idvolumen desc  limit 1) as ure, (select identrenamiento as ultimoid  from entrenamiento  order by identrenamiento desc  limit 1) as uen   set re.repeticion = ure.ultimo, re.fecha = STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'), re.estado = 4  where re.identrenamiento = uen.ultimoid;";
+            console.log(sql1);
+            mysqlConnection.query(sql1,(err, rows,fields)=>{
+              if(!err){
+                console.log(rows.nombre);
+                res.json( [{"status":1}] );
+              }else{
+                console.log(err);
+                res.json( [{"status":0}] );
+              }
+            });
+      
+          }
+        
+        });
             /***************************************************************************************************************** */
                 /***************************************************************************************************************** */
                     /***************************************************************************************************************** */
+
+/*****************WEB***************** */
     app.post('/agregarpeso/', function(req, res){/*Usuario agrega su peso*/
   
       /*
@@ -1475,84 +1554,6 @@ function calculator(la1,lo1,la2,lo2) {
           }
         });
     });
-
-    app.post('/medidaVo/', function(req, res){ // entrenamiento
-
-      /*estado= 
-      1(inicia prueba)
-      2(en prueba)
-      3(finaliza prueba)
-          {
-          "idusuario": 2,
-          "estado": 2,
-          "volumen": 5.1,
-          "periodo": 1,        
-          "fecha": "01012013 113010"
-          }
-        */   
-    
-      var entrenamiento = req.body;
-  
-      if(parseInt(entrenamiento.estado)== 1){//inicia prueba
-  
-        var sql = "insert into entrenamiento (usuario_idusuario) values ("+entrenamiento.idusuario+"); ";
-        console.log(sql);
-        mysqlConnection.query(sql,(err, rows,fields)=>{
-          if(!err){
-            console.log(rows.nombre);
-            //res.json( [{"status":1}] );  
-            var sql1 = "insert into volumen (volumen,periodo,fecha, entrenamiento_identrenamiento)  select "+entrenamiento.volumen+", "+entrenamiento.periodo+",STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'), identrenamiento   from entrenamiento  order by identrenamiento desc  limit 1;;";
-            console.log(sql1);
-            mysqlConnection.query(sql1,(err, rows,fields)=>{
-              if(!err){
-                console.log(rows.nombre);
-                res.json( [{"status":1}] );
-              }else{
-                console.log(err);
-                res.json( [{"status":0}] );
-              }
-            });
-            
-          }else{
-              console.log(err);
-              res.json( [{"status":0}] );
-          }
-        });
-  
-      }else if(parseInt(entrenamiento.estado)== 2){// en prueba
-  
-      
-        var sql1 = "insert into volumen (volumen, entrenamiento_identrenamiento,periodo,fecha)  select "+entrenamiento.volumen+", identrenamiento,"+entrenamiento.periodo+",STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s')     from entrenamiento  order by identrenamiento desc  limit 1;";
-        console.log(sql1);
-        mysqlConnection.query(sql1,(err, rows,fields)=>{
-          if(!err){
-            console.log(rows.nombre);
-            res.json( [{"status":1}] );
-          
-          }else{
-            console.log(err);
-            res.json( [{"status":0}] );
-          }
-        });
-  
-      }else if(parseInt(entrenamiento.estado)== 3){//finalizar
-    
-        var sql1 = " update entrenamiento as re, (select  periodo as ultimo   from volumen  order by idvolumen desc  limit 1) as ure, (select identrenamiento as ultimoid  from entrenamiento  order by identrenamiento desc  limit 1) as uen   set re.repeticion = ure.ultimo, re.fecha = STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'), re.estado = 4  where re.identrenamiento = uen.ultimoid;";
-        console.log(sql1);
-        mysqlConnection.query(sql1,(err, rows,fields)=>{
-          if(!err){
-            console.log(rows.nombre);
-            res.json( [{"status":1}] );
-          }else{
-            console.log(err);
-            res.json( [{"status":0}] );
-          }
-        });
-  
-      }
-    
-    });
-
 
     app.post('/volumenH/', function(req, res){ //volumen historial
 
@@ -1741,8 +1742,7 @@ function calculator(la1,lo1,la2,lo2) {
         });
     });
 
-    app.post('/intentosDetalle/', function(req, res){/*conteo de repeticiones "se deberán listar todos los entrenamientos y cuantas repeticiones logró hacer en cada
-    uno de ellos, si falló o si aprobó también deberá ser mostrado."*/
+    app.post('/intentosDetalle/', function(req, res){/*listado de intentos realizados"*/
   
       /*
         {
