@@ -1675,7 +1675,7 @@ function calculator(la1,lo1,la2,lo2) {
     
       var usuario = req.body;
   
-        var sql = "select re.entrenamiento_identrenamiento as identrenamiento, ((sum(re.volumen)*0.21)/5)/p.peso) as vo2MAX from entrenamiento as en, volumen as re, (select peso from usuario where idusuario = "+usuario.idusuario +") as p     where en.identrenamiento = re.entrenamiento_identrenamiento     and en.identrenamiento = "+usuario.identrenamiento +" and re.volumen is not null and re.volumen > 0  group by re.entrenamiento_identrenamiento;";  
+        var sql = "select re.entrenamiento_identrenamiento as identrenamiento, ((sum(re.volumen)*0.21)/5)/p.peso as vo2MAX from entrenamiento as en, volumen as re, (select peso from usuario where idusuario = "+usuario.idusuario +") as p     where en.identrenamiento = re.entrenamiento_identrenamiento     and en.identrenamiento = "+usuario.identrenamiento +" and re.volumen is not null and re.volumen > 0  group by re.entrenamiento_identrenamiento;";  
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
           if(!err){
