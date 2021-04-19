@@ -1566,7 +1566,7 @@ function calculator(la1,lo1,la2,lo2) {
     
       var usuario = req.body;
   
-        var sql = "select a.volumen as volumen, a.fecha from ( select  volumen as volumen , idvolumen, cast(fechadistancia as time) as fecha from volumen where volumen is not null  order by idvolumen desc  limit 10) as a order by a.idvolumen asc;";
+        var sql = "select a.volumen as volumen, a.fecha from ( select  volumen as volumen , idvolumen, cast(fecha as time) as fecha from volumen where volumen is not null  order by idvolumen desc  limit 10) as a order by a.idvolumen asc;";
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
 
