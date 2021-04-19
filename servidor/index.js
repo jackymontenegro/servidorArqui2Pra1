@@ -14,13 +14,13 @@ app.use(express.json());
 var mysql1 = require('mysql');
 var mysqlConnection = mysql1.createConnection({
   host: "127.0.0.1",
-  user: "arqui",
+  /*user: "arqui",
   password: "arquipractica1",
-  database: "mydb"
-
-  /*user: "jmontenegro",
-  password: "123456",
   database: "mydb"*/
+
+  user: "jmontenegro",
+  password: "123456",
+  database: "mydb"
 
 });
 
@@ -1553,6 +1553,51 @@ function calculator(la1,lo1,la2,lo2) {
     
     });
 
+
+    app.post('/volumenH/', function(req, res){ //volumen historial
+
+      /*
+
+      Envia los ultimos 50 volumenes
+        {
+        "identrenamiento": 2
+        }
+        */
+    
+      var usuario = req.body;
+  
+        var sql = "select a.volumen as volumen, a.fecha from ( select  v.volumen as volumen , v.idvolumen as idvolumen, cast(v.fecha as time) as fecha from volumen as v where v.volumen is not null and v.entrenamiento_identrenamiento = "+usuario.identrenamiento+" order by v.idvolumen desc  limit 50) as a order by a.idvolumen asc;";
+        console.log(sql);
+        mysqlConnection.query(sql,(err, rows,fields)=>{
+
+          var arraytimes = [];
+          var arraymed = [];
+          var array = [];
+    
+    
+         // Object.entries(rows).forEach(([key, value]) => console.log(`${key}: ${value.ritmo}`));
+          Object.entries(rows).forEach(([key, value]) => arraymed.push(value.volumen));
+    
+         // Object.entries(rows).forEach(([key, value]) => console.log(`${key}: ${value.fecha}`));
+          Object.entries(rows).forEach(([key, value]) => arraytimes.push(value.fecha));
+    
+          array.push(arraytimes);
+          array.push(arraymed);
+    
+          console.log(array);
+          var myJSON = JSON.stringify(array);
+          console.log(myJSON);
+
+          if(!err){
+          res.json( array);
+    
+          
+        }else{
+            console.log(err);
+            res.json(array);
+      }
+        });
+    });
     app.post('/volumenTR/', function(req, res){ //volumen en tiempo real
 
       /*
@@ -1560,7 +1605,7 @@ function calculator(la1,lo1,la2,lo2) {
       La gráfica en tiempo real de los datos recolectados por el dispositivo también es de
       carácter obligatorio y debe ser visible en todo momento.
         {
-        "idusuario": 2
+        "identrenamiento": 1
         }
         */
     
@@ -1675,7 +1720,7 @@ function calculator(la1,lo1,la2,lo2) {
     
       var usuario = req.body;
   
-        var sql = "select re.entrenamiento_identrenamiento as identrenamiento, ((sum(re.volumen)*0.21)/5)/p.peso as vo2MAX from entrenamiento as en, volumen as re, (select peso from usuario where idusuario = "+usuario.idusuario +") as p     where en.identrenamiento = re.entrenamiento_identrenamiento     and en.identrenamiento = "+usuario.identrenamiento +" and re.volumen is not null and re.volumen > 0  group by re.entrenamiento_identrenamiento;";  
+        var sql = "select re.entrenamiento_identrenamiento as identrenamiento,p.peso as peso , sum(re.volumen) as TotalInhalado,sum(re.volumen)*0.21 as porcentajeTotalOxigeno,(sum(re.volumen)*0.21)/5 as porcentajeOxigenoMinuto,  ((sum(re.volumen)*0.21)/5)/p.peso as vo2MAX from entrenamiento as en, volumen as re, (select peso from usuario where idusuario = "+usuario.idusuario +") as p     where en.identrenamiento = re.entrenamiento_identrenamiento     and en.identrenamiento = "+usuario.identrenamiento +" and re.volumen is not null and re.volumen > 0  group by re.entrenamiento_identrenamiento, peso;";  
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
           if(!err){
@@ -1687,6 +1732,10 @@ function calculator(la1,lo1,la2,lo2) {
             console.log(err);
             res.json( [{
               "identrenamiento": 0,
+              "peso": 0,
+              "TotalInhalado": 0,
+              "porcentajeTotalOxigeno": 0,
+              "porcentajeOxigenoMinuto": 0,
               "vo2MAX": 0}] );
       }
         });
