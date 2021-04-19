@@ -95,8 +95,27 @@ select * from entrenamiento;
 select * from repeticion;
 select * from velocidad;
 
-
+DROP DATABASE mydb;
 -- INICIO
+
+select re.numero as idrepeticion, avg(re.velocidad) as promedioVelocidad,
+min(re.velocidad) as minimaVelocidad,max(re.velocidad) as maximaVelocidad, 
+max(re.distanciaTotal) as distanciaTotal  from entrenamiento as en, repeticion as re  
+where en.identrenamiento = re.entrenamiento_identrenamiento   and en.identrenamiento = 1  
+and re.distanciaTotal is not null
+group by re.numero;
+
+select  avg(re.velocidad) as promedioVelocidad from entrenamiento as en, 
+repeticion as re  where en.identrenamiento = re.entrenamiento_identrenamiento   and en.identrenamiento = 2  group by re.idrepeticion;
+
+select avg(en.repeticion) as promedioRepeticion, max(en.repeticion) as maximoRepeticion, 
+min(en.repeticion) as minimoRepeticion, en.fecha as fecha  from entrenamiento as en 
+where  en.usuario_idusuario = 2  and cast(en.fecha as date) BETWEEN STR_TO_DATE('01012013 113000','%d/%m/%Y') 
+AND STR_TO_DATE('01012013 113015','%d/%m/%Y')  group by en.fecha ;
+
+select avg(en.repeticion) as promedioRepeticion, max(en.repeticion) as maximoRepeticion, 
+min(en.repeticion) as minimoRepeticion, en.fecha  as fecha1  from entrenamiento as en 
+where  en.usuario_idusuario = 2 and cast(en.fecha as date) between '2013-01-01' and '2013-01-02' group by fecha1 ;
 
 insert into entrenamiento (usuario_idusuario) values (2);
 
@@ -199,18 +218,19 @@ select re.idrepeticion, avg(ve.velocidad),min(ve.velocidad),max(ve.velocidad), r
 from entrenamiento as en, repeticion as re, velocidad as ve
 where en.identrenamiento = re.entrenamiento_identrenamiento
 and re.idrepeticion = ve.repeticion_idrepeticion
-and en.identrenamiento = 3
+and re.entrenamiento_identrenamiento = 2
 group by re.idrepeticion,re.distanciaTotal;
 
--- esta falta no se que me estara fallando
+select * from repeticion;
 
-select re.idrepeticion, avg(ve.velocidad),min(ve.velocidad),max(ve.velocidad), re.distanciaTotal
-from repeticion as re, velocidad as ve, entrenamiento as en
-where re.idrepeticion = ve.repeticion_idrepeticion
-and en.identrenamiento = re.entrenamiento_identrenamiento
-group by re.idrepeticion;
+
 
 -- CONTEO X ENTRENAMIENTO
+
+select en.identrenamiento,  en.repeticion, en.estado
+from entrenamiento as en
+where  en.usuario_idusuario = 2
+and en.estado = 1; 
 
 select en.identrenamiento,  en.repeticion, en.estado
 from entrenamiento as en
@@ -232,9 +252,14 @@ from entrenamiento as en
 where  en.usuario_idusuario = 2
 and en.estado = 0; 
 
+select en.identrenamiento,  en.repeticion, en.estado
+from entrenamiento as en
+where  en.usuario_idusuario = 2
+and estado not like 0;
+
 -- VELOCIDAD X TIEMPOREAL
 
-select * from (select ve.idvelocidad, ve.velocidad as velocidad, CAST(ve.fecha AS TIME) as fecha
+select b.idvelocidad, b.velocidad,b.fecha from (select ve.idvelocidad, ve.velocidad as velocidad, CAST(ve.fecha AS TIME) as fecha
 from entrenamiento as en, repeticion as re, velocidad as ve
 where en.identrenamiento = re.entrenamiento_identrenamiento
 and re.idrepeticion = ve.repeticion_idrepeticion
@@ -269,9 +294,12 @@ and en.identrenamiento = 3
 group by re.idrepeticion,re.distanciaTotal;
 
 select en.identrenamiento, sum(re.distanciaTotal )
-from entrenamiento as en, repeticion as re
+from entrenamiento as en, repeticion as re , (select identrenamiento as ultimoid
+from entrenamiento
+order by identrenamiento desc
+limit 1) as uen
 where en.identrenamiento = re.entrenamiento_identrenamiento
-and en.identrenamiento = 3
+and en.identrenamiento = uen.ultimoid
 group by en.identrenamiento;
 
 -- REPETICION ACTUAL
@@ -280,3 +308,19 @@ select  numero as ultimoid
 from repeticion
 order by idrepeticion desc
 limit 1;
+
+
+select re.entrenamiento_identrenamiento, avg(re.volumen) as promedioVolumen
+,min(re.volumen) as minimoVolumen,max(re.volumen) as maximoVolumen
+from entrenamiento as en, volumen as re  
+where en.identrenamiento = re.entrenamiento_identrenamiento   
+and en.identrenamiento = "+usuario.identrenamiento +" and re.volumen is not null  group by re.entrenamiento_identrenamiento;
+
+
+
+
+
+
+
+
+

@@ -1296,7 +1296,7 @@ app.post('/distanciaTR/', function(req, res){ //la distancia en tiempo real
       
   });
 
-    /***************************************************************************************************************** */
+
 
     /*Datos para el Test Course-Navette:
     Velocidad en tiempo real del atleta
@@ -1394,6 +1394,274 @@ function calculator(la1,lo1,la2,lo2) {
   km = (km * 100)/100;
   return km*1000;
 }
+
+    /***************************************************************************************************************** */
+        /***************************************************************************************************************** */
+            /***************************************************************************************************************** */
+                /***************************************************************************************************************** */
+                    /***************************************************************************************************************** */
+    app.post('/agregarpeso/', function(req, res){/*Usuario agrega su peso*/
+  
+      /*
+        {
+        "idusuario": 2,
+        "peso": 150.2
+        }
+        */
+    
+      var usuario = req.body;
+  
+        var sql = "update usuario set peso = "+usuario.peso+" where idusuario =  "+usuario.idusuario+";";  
+        console.log(sql);
+        mysqlConnection.query(sql,(err, rows,fields)=>{
+          if(!err){
+            console.log(rows.nombre);
+            res.json( [{"status":1}] );
+          }else{
+            console.log(err);
+            res.json( [{"status":0}] );
+          }
+        });
+    });
+
+    app.post('/traerpeso/', function(req, res){/*Traer el peso del usuario*/
+  
+      /*
+        {
+        "idusuario": 2
+        }
+        */
+    
+      var usuario = req.body;
+  
+        var sql = "select peso from usuario where idusuario = "+usuario.idusuario+";";  
+        console.log(sql);
+        mysqlConnection.query(sql,(err, rows,fields)=>{
+          if(!err){
+            console.log(rows.nombre);
+            res.json(rows );
+          }else{
+            console.log(err);
+            res.json( [{"peso":0}] );
+          }
+        });
+    });
+
+    app.post('/medidaVo/', function(req, res){ // entrenamiento
+
+      /*estado= 
+      1(inicia prueba)
+      2(en prueba)
+      3(finaliza prueba)
+          {
+          "idusuario": 2,
+          "estado": 2,
+          "volumen": 5.1,
+          "periodo": 1,        
+          "fecha": "01012013 113010"
+          }
+        */   
+    
+      var entrenamiento = req.body;
+  
+      if(parseInt(entrenamiento.estado)== 1){//inicia prueba
+  
+        var sql = "insert into entrenamiento (usuario_idusuario) values ("+entrenamiento.idusuario+"); ";
+        console.log(sql);
+        mysqlConnection.query(sql,(err, rows,fields)=>{
+          if(!err){
+            console.log(rows.nombre);
+            //res.json( [{"status":1}] );  
+            var sql1 = "insert into volumen (volumen,periodo,fecha, entrenamiento_identrenamiento)  select "+entrenamiento.volumen+", "+entrenamiento.periodo+",STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'), identrenamiento   from entrenamiento  order by identrenamiento desc  limit 1;;";
+            console.log(sql1);
+            mysqlConnection.query(sql1,(err, rows,fields)=>{
+              if(!err){
+                console.log(rows.nombre);
+                res.json( [{"status":1}] );
+              }else{
+                console.log(err);
+                res.json( [{"status":0}] );
+              }
+            });
+            
+          }else{
+              console.log(err);
+              res.json( [{"status":0}] );
+          }
+        });
+  
+      }else if(parseInt(entrenamiento.estado)== 2){// en prueba
+  
+      
+        var sql1 = "insert into volumen (volumen, entrenamiento_identrenamiento,periodo,fecha)  select "+entrenamiento.volumen+", identrenamiento,"+entrenamiento.periodo+",STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s')     from entrenamiento  order by identrenamiento desc  limit 1;";
+        console.log(sql1);
+        mysqlConnection.query(sql1,(err, rows,fields)=>{
+          if(!err){
+            console.log(rows.nombre);
+            res.json( [{"status":1}] );
+          
+          }else{
+            console.log(err);
+            res.json( [{"status":0}] );
+          }
+        });
+  
+      }else if(parseInt(entrenamiento.estado)== 3){//finalizar
+    
+        var sql1 = " update entrenamiento as re, (select  periodo as ultimo   from volumen  order by idvolumen desc  limit 1) as ure, (select identrenamiento as ultimoid  from entrenamiento  order by identrenamiento desc  limit 1) as uen   set re.repeticion = ure.ultimo, re.fecha = STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'), re.estado = 3  where re.identrenamiento = uen.ultimoid;";
+        console.log(sql1);
+        mysqlConnection.query(sql1,(err, rows,fields)=>{
+          if(!err){
+            console.log(rows.nombre);
+            res.json( [{"status":1}] );
+          }else{
+            console.log(err);
+            res.json( [{"status":0}] );
+          }
+        });
+  
+      }
+    
+    });
+
+    app.post('/volumenTR/', function(req, res){ //volumen en tiempo real
+
+      /*
+
+      La gráfica en tiempo real de los datos recolectados por el dispositivo también es de
+      carácter obligatorio y debe ser visible en todo momento.
+        {
+        "idusuario": 2
+        }
+        */
+    
+      var usuario = req.body;
+  
+        var sql = "select a.volumen as volumen, a.fecha from ( select  volumen as volumen , idvolumen, cast(fechadistancia as time) as fecha from volumen where volumen is not null  order by idvolumen desc  limit 10) as a order by a.idvolumen asc;";
+        console.log(sql);
+        mysqlConnection.query(sql,(err, rows,fields)=>{
+
+          var arraytimes = [];
+          var arraymed = [];
+          var array = [];
+    
+    
+         // Object.entries(rows).forEach(([key, value]) => console.log(`${key}: ${value.ritmo}`));
+          Object.entries(rows).forEach(([key, value]) => arraymed.push(value.volumen));
+    
+         // Object.entries(rows).forEach(([key, value]) => console.log(`${key}: ${value.fecha}`));
+          Object.entries(rows).forEach(([key, value]) => arraytimes.push(value.fecha));
+    
+          array.push(arraytimes);
+          array.push(arraymed);
+    
+          console.log(array);
+          var myJSON = JSON.stringify(array);
+          console.log(myJSON);
+
+          if(!err){
+          res.json( array);
+    
+          
+        }else{
+            console.log(err);
+            res.json(array);
+      }
+        });
+    });
+
+    app.post('/reporteIN/', function(req, res){/*
+      ● Volumen máximo inhalado
+      ● Volumen mínimo inhalado
+      ● Promedio de volumen inhalado*/
+  
+      /*
+        {
+        "identrenamiento": 2
+        }
+        */
+    
+      var usuario = req.body;
+  
+        var sql = "select re.entrenamiento_identrenamiento as identrenamiento, avg(re.volumen) as promedioVolumen ,min(re.volumen) as minimoVolumen,max(re.volumen) as maximoVolumen  from entrenamiento as en, volumen as re      where en.identrenamiento = re.entrenamiento_identrenamiento     and en.identrenamiento = "+usuario.identrenamiento +" and re.volumen is not null and re.volumen > 0  group by re.entrenamiento_identrenamiento;";  
+        console.log(sql);
+        mysqlConnection.query(sql,(err, rows,fields)=>{
+          if(!err){
+          console.log(rows.nombre);
+          res.json( rows);
+    
+          
+        }else{
+            console.log(err);
+            res.json( [{
+              "identrenamiento": 0,
+              "promedioVolumen": 0,
+              "minimoVolumen": 0,
+              "maximoVolumen": 0}] );
+      }
+        });
+    });
+
+    app.post('/reporteEX/', function(req, res){/*
+      ● Volumen máximo exhalado
+      ● Volumen mínimo exhalado
+      ● Promedio de volumen exhalado*/
+  
+      /*
+        {
+        "identrenamiento": 2
+        }
+        */
+    
+      var usuario = req.body;
+  
+        var sql = "select re.entrenamiento_identrenamiento as identrenamiento, avg(re.volumen) as promedioVolumen ,min(re.volumen) as minimoVolumen,max(re.volumen) as maximoVolumen  from entrenamiento as en, volumen as re      where en.identrenamiento = re.entrenamiento_identrenamiento     and en.identrenamiento = "+usuario.identrenamiento +" and re.volumen is not null and re.volumen < 0  group by re.entrenamiento_identrenamiento;";  
+        console.log(sql);
+        mysqlConnection.query(sql,(err, rows,fields)=>{
+          if(!err){
+          console.log(rows.nombre);
+          res.json( rows);
+    
+          
+        }else{
+            console.log(err);
+            res.json( [{
+              "identrenamiento": 0,
+              "promedioVolumen": 0,
+              "minimoVolumen": 0,
+              "maximoVolumen": 0}] );
+      }
+        });
+    });
+  
+    app.post('/calculoVO2MAX/', function(req, res){/*
+      ● Medición final de vo2 max.*/
+  
+      /*
+        {
+        "idusuario": 2,
+        "identrenamiento": 2
+        }
+        */
+    
+      var usuario = req.body;
+  
+        var sql = "select re.entrenamiento_identrenamiento as identrenamiento, ((sum(re.volumen)*0.21)/5)/p.peso) as vo2MAX from entrenamiento as en, volumen as re, (select peso from usuario where idusuario = "+usuario.idusuario +") as p     where en.identrenamiento = re.entrenamiento_identrenamiento     and en.identrenamiento = "+usuario.identrenamiento +" and re.volumen is not null and re.volumen > 0  group by re.entrenamiento_identrenamiento;";  
+        console.log(sql);
+        mysqlConnection.query(sql,(err, rows,fields)=>{
+          if(!err){
+          console.log(rows.nombre);
+          res.json( rows);
+    
+          
+        }else{
+            console.log(err);
+            res.json( [{
+              "identrenamiento": 0,
+              "vo2MAX": 0}] );
+      }
+        });
+    });
 
 
    /*
