@@ -1491,13 +1491,13 @@ app.post('/horaInicioEntrenamiento/', function(req, res){/*Trae la hora a la que
   
       /*
         {
-        "idusuario": 2
+        "identrenamiento": 8
         }
         */
     
       var usuario = req.body;
   
-        var sql = "select cast(fecha as time) as hora   from entrenamiento where usuario_idusuario = "+usuario.idusuario+" and estado = 2  order by identrenamiento desc  limit 1;";  
+        var sql = "select cast(fecha as time) as hora   from entrenamiento where identrenamiento = "+usuario.identrenamiento+" and estado = 2   limit 1;";  
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
           if(!err){
