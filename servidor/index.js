@@ -1446,7 +1446,7 @@ function calculator(la1,lo1,la2,lo2) {
       
           if(parseInt(entrenamiento.estado)== 1){//inicia prueba
       
-            var sql = "insert into entrenamiento (usuario_idusuario,estado) values ("+entrenamiento.idusuario+",2); ";
+            var sql = "insert into entrenamiento (usuario_idusuario,estado,fecha) values ("+entrenamiento.idusuario+",2,STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s')); ";
             console.log(sql);
             mysqlConnection.query(sql,(err, rows,fields)=>{
               if(!err){
@@ -1532,6 +1532,27 @@ function calculator(la1,lo1,la2,lo2) {
         });
     });
 
+app.post('/horaInicioEntrenamiento/', function(req, res){/*Trae la hora a la que inicio el ultimo entrenamiento en curso del usuario*/
+  
+      /*
+        {
+        "idusuario": 2
+        }
+        */
+    
+      var usuario = req.body;
+  
+        var sql = "select cast(fecha as time) as hora   from entrenamiento where usuario_idusuario = "+usuario.idusuario+" and estado = 2  order by identrenamiento desc  limit 1;";  
+        console.log(sql);
+        mysqlConnection.query(sql,(err, rows,fields)=>{
+          if(!err){
+              res.json(rows);          
+          }else{
+            console.log(err);
+            res.json( [{"hora":0}] );
+          }
+        });
+    });
 
 
 app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del ultimo entrenamiento*/
