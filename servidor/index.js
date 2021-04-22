@@ -1546,7 +1546,13 @@ app.post('/horaInicioEntrenamiento/', function(req, res){/*Trae la hora a la que
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
           if(!err){
-              res.json(rows);          
+            if(Object.entries(rows).length === 0){
+        console.log('vacio');
+        res.json( [{"hora":0}] );
+      }else{
+        res.json(rows);  
+         }
+                      
           }else{
             console.log(err);
             res.json( [{"hora":0}] );
