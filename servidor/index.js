@@ -1446,13 +1446,13 @@ function calculator(la1,lo1,la2,lo2) {
       
           if(parseInt(entrenamiento.estado)== 1){//inicia prueba
       
-            var sql = "insert into entrenamiento (usuario_idusuario) values ("+entrenamiento.idusuario+"); ";
+            var sql = "insert into entrenamiento (usuario_idusuario,estado) values ("+entrenamiento.idusuario+",2); ";
             console.log(sql);
             mysqlConnection.query(sql,(err, rows,fields)=>{
               if(!err){
                 console.log(rows.nombre);
                 //res.json( [{"status":1}] );  
-                var sql1 = "insert into volumen (volumen,periodo,fecha, entrenamiento_identrenamiento,estado)  select "+entrenamiento.volumen+", "+entrenamiento.periodo+",STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'), identrenamiento,2   from entrenamiento  order by identrenamiento desc  limit 1;;";
+                var sql1 = "insert into volumen (volumen,periodo,fecha, entrenamiento_identrenamiento)  select "+entrenamiento.volumen+", "+entrenamiento.periodo+",STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'), identrenamiento  from entrenamiento  order by identrenamiento desc  limit 1;;";
                 console.log(sql1);
                 mysqlConnection.query(sql1,(err, rows,fields)=>{
                   if(!err){
