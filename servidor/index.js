@@ -1767,7 +1767,7 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
     
       var usuario = req.body;
   
-        var sql = "select en.identrenamiento as identrenamiento, en.usuario_idusuario as idusuario, en.repeticion as repeticion, en.estado as estado, en.fecha as fecha  from entrenamiento as en  where  en.usuario_idusuario ="+usuario.idusuario+" and en.estado = 4 and en.fecha is not null; ";
+        var sql = "select en.identrenamiento as identrenamiento, en.usuario_idusuario as idusuario, en.repeticion as repeticion, en.estado as estado, cast(a.fecha as time)  as fecha, cast(a.fecha as datetime)  as fecha2, , cast(a.fecha as datetime)  as fecha3,CONVERT(varchar, a.fecha, 120)  from entrenamiento as en  where  en.usuario_idusuario ="+usuario.idusuario+" and en.estado = 4 and en.fecha is not null; ";
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
           if(!err){
