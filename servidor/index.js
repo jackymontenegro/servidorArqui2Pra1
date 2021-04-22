@@ -140,8 +140,7 @@ app.get('/ejemplo/', function(req, res){
     console.log(sql);
     mysqlConnection.query(sql,(err, rows,fields)=>{
       if(!err){
-      //console.log(rows.nombre);
-      //console.log(typeof(rows));
+
 
       if(Object.entries(rows).length === 0){
         console.log('vacio');
@@ -226,7 +225,7 @@ app.get('/ejemplo/', function(req, res){
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
           if(!err){
-          console.log(rows.nombre);
+
           res.json( [{"status":1}] );
     
           
@@ -253,7 +252,7 @@ app.get('/ejemplo/', function(req, res){
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
           if(!err){
-          console.log(rows.nombre);
+
           res.json( [{"status":1}] );
     
           
@@ -280,7 +279,7 @@ app.get('/ejemplo/', function(req, res){
       console.log(sql);
       mysqlConnection.query(sql,(err, rows,fields)=>{
         if(!err){
-        console.log(rows.nombre);
+
         res.json( [{"status":1}] );
   
         
@@ -307,7 +306,7 @@ app.get('/ejemplo/', function(req, res){
     console.log(sql);
     mysqlConnection.query(sql,(err, rows,fields)=>{
       if(!err){
-      console.log(rows.nombre);
+
       res.json( [{"status":1}] );
 
       
@@ -328,7 +327,6 @@ app.get('/ejemplo/', function(req, res){
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
           if(!err){
-          console.log(rows.nombre);
           res.json( rows);
     
           
@@ -349,7 +347,6 @@ app.get('/ejemplo/', function(req, res){
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
           if(!err){
-            console.log(rows.nombre);
             res.json( rows);
       
             
@@ -371,7 +368,7 @@ app.get('/ejemplo/', function(req, res){
       console.log(sql);
       mysqlConnection.query(sql,(err, rows,fields)=>{
         if(!err){
-          console.log(rows.nombre);
+  
           res.json( rows);
     
           
@@ -427,9 +424,6 @@ app.get('/ejemplo/', function(req, res){
           var myJSON = JSON.stringify(array);
           console.log(myJSON);
           if(!err){
-          //console.log(rows.nombre);
-          //console.log(typeof(rows));
-          
 
           res.json( array);
     
@@ -463,9 +457,6 @@ app.get('/ejemplo/', function(req, res){
         var myJSON = JSON.stringify(array);
         console.log(myJSON);
         if(!err){
-        //console.log(rows.nombre);
-        //console.log(typeof(rows));
-        
 
         res.json( array);
   
@@ -501,9 +492,6 @@ app.get('/ejemplo/', function(req, res){
          var myJSON = JSON.stringify(array);
          console.log(myJSON);
          if(!err){
-         //console.log(rows.nombre);
-         //console.log(typeof(rows));
-         
 
          res.json( array);
    
@@ -550,9 +538,6 @@ app.get('/ejemplo/', function(req, res){
           var myJSON = JSON.stringify(array);
           console.log(myJSON);
           if(!err){
-          //console.log(rows.nombre);
-          //console.log(typeof(rows));
-          
 
           res.json( array);
     
@@ -586,9 +571,7 @@ app.get('/ejemplo/', function(req, res){
         var myJSON = JSON.stringify(array);
         console.log(myJSON);
         if(!err){
-        //console.log(rows.nombre);
-        //console.log(typeof(rows));
-        
+
 
         res.json( array);
   
@@ -624,9 +607,6 @@ app.get('/ejemplo/', function(req, res){
          var myJSON = JSON.stringify(array);
          console.log(myJSON);
          if(!err){
-         //console.log(rows.nombre);
-         //console.log(typeof(rows));
-         
 
          res.json( array);
    
@@ -657,9 +637,6 @@ app.get('/ejemplo/', function(req, res){
         mysqlConnection.query(sql,(err, rows,fields)=>{
 
           if(!err){
-          //console.log(rows.nombre);
-          //console.log(typeof(rows));
-          
 
           res.json( rows);
     
@@ -676,9 +653,6 @@ app.get('/ejemplo/', function(req, res){
       console.log(sql);
       mysqlConnection.query(sql,(err, rows,fields)=>{
         if(!err){
-          //console.log(rows.nombre);
-          //console.log(typeof(rows));
-          
 
           res.json( rows);
     
@@ -697,9 +671,6 @@ app.get('/ejemplo/', function(req, res){
        console.log(sql);
        mysqlConnection.query(sql,(err, rows,fields)=>{
         if(!err){
-          //console.log(rows.nombre);
-          //console.log(typeof(rows));
-          
 
           res.json( rows);
     
@@ -724,8 +695,7 @@ app.get('/ejemplo/', function(req, res){
       console.log(sql);
       mysqlConnection.query(sql,(err, rows,fields)=>{
         if(!err){
-        //console.log(rows.nombre);
-        //console.log(typeof(rows));
+
         res.json( rows);
   
         
@@ -797,13 +767,12 @@ app.get('/ejemplo2/', function(req, res){
       console.log(sql);
       mysqlConnection.query(sql,(err, rows,fields)=>{
         if(!err){
-          console.log(rows.nombre);
           //res.json( [{"status":1}] );  
           var sql1 = "insert into repeticion (numero, entrenamiento_identrenamiento)  select 0, identrenamiento   from entrenamiento  order by identrenamiento desc  limit 1;;";
           console.log(sql1);
           mysqlConnection.query(sql1,(err, rows,fields)=>{
             if(!err){
-              console.log(rows.nombre);
+              
               res.json( [{"status":1}] );
             }else{
               console.log(err);
@@ -825,7 +794,7 @@ app.get('/ejemplo2/', function(req, res){
         console.log(sql1);
         mysqlConnection.query(sql1,(err, rows,fields)=>{
           if(!err){
-            console.log(rows.nombre);
+      
             res.json( [{"status":1}] );  
           }else{
             console.log(err);
@@ -845,7 +814,7 @@ app.get('/ejemplo2/', function(req, res){
               console.log(sql1);
               mysqlConnection.query(sql1,(err, rows,fields)=>{
                 if(!err){
-                  console.log(rows.nombre);
+         
                   res.json( [{"status":1}] );
                 
                 }else{
@@ -871,7 +840,7 @@ app.get('/ejemplo2/', function(req, res){
               console.log(sql1);
               mysqlConnection.query(sql1,(err, rows,fields)=>{
                 if(!err){
-                  console.log(rows.nombre);
+                
                   res.json( [{"status":1}] );
                 
                 }else{
@@ -896,7 +865,7 @@ app.get('/ejemplo2/', function(req, res){
       console.log(sql1);
       mysqlConnection.query(sql1,(err, rows,fields)=>{
         if(!err){
-          console.log(rows.nombre);
+
           res.json( [{"status":1}] );
         }else{
           console.log(err);
@@ -910,7 +879,7 @@ app.get('/ejemplo2/', function(req, res){
       console.log(sql1);
       mysqlConnection.query(sql1,(err, rows,fields)=>{
         if(!err){
-          console.log(rows.nombre);
+     
           res.json( [{"status":1}] );
         }else{
           console.log(err);
@@ -924,7 +893,7 @@ app.get('/ejemplo2/', function(req, res){
         console.log(sql1);
         mysqlConnection.query(sql1,(err, rows,fields)=>{
           if(!err){
-            console.log(rows.nombre);
+         
             res.json( [{"status":1}] );  
           }else{
             console.log(err);
@@ -953,7 +922,7 @@ app.get('/ejemplo2/', function(req, res){
       console.log(sql);
       mysqlConnection.query(sql,(err, rows,fields)=>{
         if(!err){
-        console.log(rows.nombre);
+  
         res.json( rows);
   
         
@@ -985,7 +954,6 @@ app.get('/ejemplo2/', function(req, res){
       console.log(sql);
       mysqlConnection.query(sql,(err, rows,fields)=>{
         if(!err){
-        console.log(rows.nombre);
         res.json( rows);
   
         
@@ -1031,7 +999,7 @@ app.get('/ejemplo2/', function(req, res){
       console.log(sql);
       mysqlConnection.query(sql,(err, rows,fields)=>{
         if(!err){
-        console.log(rows.nombre);
+
         res.json( rows);
   
         
@@ -1050,7 +1018,7 @@ app.get('/ejemplo2/', function(req, res){
       console.log(sql);
       mysqlConnection.query(sql,(err, rows,fields)=>{
         if(!err){
-        console.log(rows.nombre);
+
         res.json( rows);
   
         
@@ -1088,7 +1056,7 @@ app.get('/ejemplo2/', function(req, res){
       console.log(sql);
       mysqlConnection.query(sql,(err, rows,fields)=>{
         if(!err){
-        console.log(rows.nombre);
+
         res.json( rows);
   
         
@@ -1115,7 +1083,7 @@ app.post('/totalesx/', function(req, res){
       console.log(sql);
       mysqlConnection.query(sql,(err, rows,fields)=>{
         if(!err){
-        console.log(rows.nombre);
+
         res.json( rows);
   
         
@@ -1137,7 +1105,7 @@ app.post('/totalesx/', function(req, res){
     console.log(sql);
     mysqlConnection.query(sql,(err, rows,fields)=>{
       if(!err){
-      console.log(rows.nombre);
+
       res.json( rows);
 
       
@@ -1179,9 +1147,6 @@ app.post('/RitmoCardiacoTR/', function (req, res) {//solo ritmo cardiaco en tiem
       var myJSON = JSON.stringify(array);
       console.log(myJSON);
       if(!err){
-      //console.log(rows.nombre);
-      //console.log(typeof(rows));
-      
 
       res.json( array);
 
@@ -1220,9 +1185,7 @@ app.post('/distanciaTR/', function(req, res){ //la distancia en tiempo real
       var myJSON = JSON.stringify(array);
       console.log(myJSON);
       if(!err){
-      //console.log(rows.nombre);
-      //console.log(typeof(rows));
-      
+
 
       res.json( array);
     
@@ -1249,7 +1212,6 @@ app.post('/distanciaTR/', function(req, res){ //la distancia en tiempo real
       console.log(sql);
       mysqlConnection.query(sql,(err, rows,fields)=>{
         if(!err){
-        console.log(rows.nombre);
         res.json( rows);
   
         
@@ -1289,7 +1251,6 @@ app.post('/distanciaTR/', function(req, res){ //la distancia en tiempo real
       console.log(sql);
       mysqlConnection.query(sql,(err, rows,fields)=>{
         if(!err){
-        console.log(rows.nombre);
         res.json( rows);
   
         
@@ -1307,7 +1268,6 @@ app.post('/distanciaTR/', function(req, res){ //la distancia en tiempo real
       console.log(sql);
       mysqlConnection.query(sql,(err, rows,fields)=>{
         if(!err){
-        console.log(rows.nombre);
         res.json( rows);
   
         
@@ -1450,13 +1410,11 @@ function calculator(la1,lo1,la2,lo2) {
             console.log(sql);
             mysqlConnection.query(sql,(err, rows,fields)=>{
               if(!err){
-                console.log(rows.nombre);
-                //res.json( [{"status":1}] );  
+
                 var sql1 = "insert into volumen (volumen,periodo,fecha, entrenamiento_identrenamiento)  select "+entrenamiento.volumen+", "+entrenamiento.periodo+",STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'), identrenamiento  from entrenamiento  order by identrenamiento desc  limit 1;;";
                 console.log(sql1);
                 mysqlConnection.query(sql1,(err, rows,fields)=>{
                   if(!err){
-                    console.log(rows.nombre);
                     res.json( [{"status":1}] );
                   }else{
                     console.log(err);
@@ -1477,7 +1435,6 @@ function calculator(la1,lo1,la2,lo2) {
             console.log(sql1);
             mysqlConnection.query(sql1,(err, rows,fields)=>{
               if(!err){
-                console.log(rows.nombre);
                 res.json( [{"status":1}] );
               
               }else{
@@ -1492,7 +1449,6 @@ function calculator(la1,lo1,la2,lo2) {
             console.log(sql1);
             mysqlConnection.query(sql1,(err, rows,fields)=>{
               if(!err){
-                console.log(rows.nombre);
                 res.json( [{"status":1}] );
               }else{
                 console.log(err);
@@ -1523,7 +1479,6 @@ function calculator(la1,lo1,la2,lo2) {
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
           if(!err){
-            console.log(rows.nombre);
             res.json( [{"status":1}] );
           }else{
             console.log(err);
@@ -1548,14 +1503,14 @@ app.post('/horaInicioEntrenamiento/', function(req, res){/*Trae la hora a la que
           if(!err){
             if(Object.entries(rows).length === 0){
         console.log('vacio');
-        res.json( [{"hora":0}] );
+        res.json( [{"hora":"0"}] );
       }else{
         res.json(rows);  
          }
                       
           }else{
             console.log(err);
-            res.json( [{"hora":0}] );
+            res.json( [{"hora":"0"}] );
           }
         });
     });
@@ -1607,7 +1562,6 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
           if(!err){
-            console.log(rows.nombre);
             res.json(rows );
           }else{
             console.log(err);
@@ -1723,7 +1677,7 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
           if(!err){
-          console.log(rows.nombre);
+
           res.json( rows);
     
           
@@ -1755,7 +1709,7 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
           if(!err){
-          console.log(rows.nombre);
+
           res.json( rows);
     
           
@@ -1786,7 +1740,7 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
           if(!err){
-          console.log(rows.nombre);
+
           res.json( rows);
     
           
@@ -1817,7 +1771,7 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
           if(!err){
-          console.log(rows.nombre);
+
           res.json( rows);
     
           
@@ -1834,243 +1788,4 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
     });
 
 
-   /*
-
-       app.get('/ritmoHistorial/', function (req, res) {
-
-      //http://localhost:3000/ritmoHistorial/?idusuario=2
   
-      let idusuario = req.query.idusuario;
-      console.log(idusuario);
-  
-      var sql = "select b.ritmo, b.fecha from (select usuario_idusuario, ritmo, fecha from ritmo where usuario_idusuario = "+parseInt(idusuario)+" order by usuario_idusuario desc limit 10) as b order by b.usuario_idusuario asc;";
-      console.log(sql);
-      mysqlConnection.query(sql,(err, rows,fields)=>{
-        if(!err){
-        //console.log(rows.nombre);
-        //console.log(typeof(rows));
-        res.json( rows);
-  
-        
-      }else{
-          console.log(err);
-          res.json(rows);
-    }
-      });
-    });
-
-    app.get('/oxigenoHistorial/', function (req, res) {
-
-      //http://localhost:3000/oxigenoHistorial/?idusuario=2
-  
-      let idusuario = req.query.idusuario;
-      console.log(idusuario);
-  
-      var sql = "select usuario_idusuario, oxigeno, fecha from oxigeno where usuario_idusuario = "+parseInt(idusuario)+";";
-      console.log(sql);
-      mysqlConnection.query(sql,(err, rows,fields)=>{
-        if(!err){
-        //console.log(rows.nombre);
-        //console.log(typeof(rows));
-        res.json( rows);
-  
-        
-      }else{
-          console.log(err);
-          res.json(rows);
-    }
-      });
-    });
-
-    app.get('/temperaturaHistorial/', function (req, res) {
-
-      //http://localhost:3000/temperaturaHistorial/?idusuario=2
-  
-      let idusuario = req.query.idusuario;
-      console.log(idusuario);
-  
-      var sql = "select usuario_idusuario, temperatura, fecha from temperatura where usuario_idusuario = "+parseInt(idusuario)+";";
-      console.log(sql);
-      mysqlConnection.query(sql,(err, rows,fields)=>{
-        if(!err){
-        //console.log(rows.nombre);
-        //console.log(typeof(rows));
-        res.json( rows);
-  
-        
-      }else{
-          console.log(err);
-          res.json(rows);
-    }
-      });
-    });
-*/
-
-/*
-
- app.get('/ritmoTR/', function (req, res) {
-
-      //http://localhost:3000/ritmoTR/?idusuario=2
-  
-      let idusuario = req.query.idusuario;
-      console.log(idusuario);
-  
-      var sql = "select usuario_idusuario, ritmo, fecha from ritmo where usuario_idusuario = "+parseInt(idusuario)+" order by idritmo desc limit 1;";
-      console.log(sql);
-      mysqlConnection.query(sql,(err, rows,fields)=>{
-        if(!err){
-        //console.log(rows.nombre);
-        //console.log(typeof(rows));
-        res.json( rows);
-  
-        
-      }else{
-          console.log(err);
-          res.json(rows);
-    }
-      });
-    });
-
-
-    app.get('/oxigenoTR/', function (req, res) {
-
-      //http://localhost:3000/oxigenoTR/?idusuario=2
-  
-      let idusuario = req.query.idusuario;
-      console.log(idusuario);
-  
-      var sql = "select usuario_idusuario, oxigeno, fecha from oxigeno where usuario_idusuario = "+parseInt(idusuario)+" order by idoxigeno desc limit 1;";
-      console.log(sql);
-      mysqlConnection.query(sql,(err, rows,fields)=>{
-        if(!err){
-        //console.log(rows.nombre);
-        //console.log(typeof(rows));
-        res.json( rows);
-  
-        
-      }else{
-          console.log(err);
-          res.json(rows);
-    }
-      });
-    });
-
-    app.get('/temperaturaTR/', function (req, res) {
-
-      //http://localhost:3000/temperaturaTR/?idusuario=2
-  
-      let idusuario = req.query.idusuario;
-      console.log(idusuario);
-  
-      var sql = "select usuario_idusuario, temperatura, fecha from temperatura where usuario_idusuario = "+parseInt(idusuario)+" order by idtemperatura desc limit 1;";
-      console.log(sql);
-      mysqlConnection.query(sql,(err, rows,fields)=>{
-        if(!err){
-        //console.log(rows.nombre);
-        //console.log(typeof(rows));
-        res.json( rows);
-  
-        
-      }else{
-          console.log(err);
-          res.json(rows);
-    }
-      });
-    });
-
-    */
-
-
-
-   /* app.post('/ritmoPro/', function (req, res) {
-
-      //http://localhost:3000/ritmoPro/?idusuario=2
-  
-      let idusuario = req.query.idusuario;
-      console.log(idusuario);
-  
-      var sql = "select usuario_idusuario, avg(ritmo) from ritmo where usuario_idusuario = "+parseInt(idusuario)+" group by usuario_idusuario;";
-      console.log(sql);
-      mysqlConnection.query(sql,(err, rows,fields)=>{
-        if(!err){
-        //console.log(rows.nombre);
-        //console.log(typeof(rows));
-        res.json( rows);
-  
-        
-      }else{
-          console.log(err);
-          res.json(rows);
-    }
-      });
-    });
-
-    app.get('/oxigenoPro/', function (req, res) {
-
-      //http://localhost:3000/oxigenoPro/?idusuario=2
-  
-      let idusuario = req.query.idusuario;
-      console.log(idusuario);
-  
-      var sql = "select usuario_idusuario, avg(oxigeno) from oxigeno where usuario_idusuario = "+parseInt(idusuario)+" group by usuario_idusuario;";
-      console.log(sql);
-      mysqlConnection.query(sql,(err, rows,fields)=>{
-        if(!err){
-        //console.log(rows.nombre);
-        //console.log(typeof(rows));
-        res.json( rows);
-  
-        
-      }else{
-          console.log(err);
-          res.json(rows);
-    }
-      });
-    });
-
-    app.get('/temperaturaMax/', function (req, res) {
-
-      //http://localhost:3000/temperaturaPro/?idusuario=2
-  
-      let idusuario = req.query.idusuario;
-      console.log(idusuario);
-  
-      var sql = "select usuario_idusuario, max(temperatura) from temperatura where usuario_idusuario = "+parseInt(idusuario)+" group by usuario_idusuario ; ";
-      console.log(sql);
-      mysqlConnection.query(sql,(err, rows,fields)=>{
-        if(!err){
-        //console.log(rows.nombre);
-        //console.log(typeof(rows));
-        res.json( rows);
-  
-        
-      }else{
-          console.log(err);
-          res.json(rows);
-    }
-      });
-
- app.get('/temperaturaMin/', function (req, res) {
-
-      //http://localhost:3000/temperaturaPro/?idusuario=2
-  
-      let idusuario = req.query.idusuario;
-      console.log(idusuario);
-  
-      var sql = "select usuario_idusuario, min(temperatura) from temperatura where usuario_idusuario = "+parseInt(idusuario)+" group by usuario_idusuario ; ";
-      console.log(sql);
-      mysqlConnection.query(sql,(err, rows,fields)=>{
-        if(!err){
-        //console.log(rows.nombre);
-        //console.log(typeof(rows));
-        res.json( rows);
-  
-        
-      }else{
-          console.log(err);
-          res.json(rows);
-    }
-      });
-    });
-
-    });*/
