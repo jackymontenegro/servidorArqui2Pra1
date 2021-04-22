@@ -1452,7 +1452,7 @@ function calculator(la1,lo1,la2,lo2) {
               if(!err){
                 console.log(rows.nombre);
                 //res.json( [{"status":1}] );  
-                var sql1 = "insert into volumen (volumen,periodo,fecha, entrenamiento_identrenamiento)  select "+entrenamiento.volumen+", "+entrenamiento.periodo+",STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'), identrenamiento   from entrenamiento  order by identrenamiento desc  limit 1;;";
+                var sql1 = "insert into volumen (volumen,periodo,fecha, entrenamiento_identrenamiento,estado)  select "+entrenamiento.volumen+", "+entrenamiento.periodo+",STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'), identrenamiento,2   from entrenamiento  order by identrenamiento desc  limit 1;;";
                 console.log(sql1);
                 mysqlConnection.query(sql1,(err, rows,fields)=>{
                   if(!err){
@@ -1532,6 +1532,40 @@ function calculator(la1,lo1,la2,lo2) {
         });
     });
 
+
+
+app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del ultimo entrenamiento*/
+  
+      /*
+        {
+        "idusuario": 2
+        }
+        */
+    
+      var usuario = req.body;
+  
+        var sql = "select identrenamiento as identrenamiento, estado as estado   from entrenamiento where usuario_idusuario = "+usuario.idusuario+"  order by identrenamiento desc  limit 1;";  
+        console.log(sql);
+        mysqlConnection.query(sql,(err, rows,fields)=>{
+          if(!err){
+            
+            Object.entries(rows).forEach(([key, value]) => a = value.estado);
+            
+            if(parseInt(a) == 2){//en curso
+              res.json(rows );
+               }else if(parseInt(a) == 4){//finalizado
+              res.json(rows );
+               }else{//cualquier otro 
+              res.json( [{"estado":0}] );
+               }
+            
+            
+          }else{
+            console.log(err);
+            res.json( [{"estado":0}] );
+          }
+        });
+    });
     app.post('/traerpeso/', function(req, res){/*Traer el peso del usuario*/
   
       /*
