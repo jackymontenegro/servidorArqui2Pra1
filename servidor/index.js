@@ -1406,7 +1406,7 @@ function calculator(la1,lo1,la2,lo2) {
       
           if(parseInt(entrenamiento.estado)== 1){//inicia prueba
       
-            var sql = "insert into entrenamiento (usuario_idusuario,estado,fecha,repeticion) values ("+entrenamiento.idusuario+",2,STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s',1)); ";
+            var sql = "insert into entrenamiento (usuario_idusuario,estado,fecha,repeticion) values ("+entrenamiento.idusuario+",2,STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'),1); ";
             console.log(sql);
             mysqlConnection.query(sql,(err, rows,fields)=>{
               if(!err){
