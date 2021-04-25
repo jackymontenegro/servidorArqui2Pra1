@@ -1406,7 +1406,7 @@ function calculator(la1,lo1,la2,lo2) {
       
           if(parseInt(entrenamiento.estado)== 1){//inicia prueba
       
-            var sql = "insert into entrenamiento (usuario_idusuario,estado,fecha) values ("+entrenamiento.idusuario+",2,STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s')); ";
+            var sql = "insert into entrenamiento (usuario_idusuario,estado,fecha,repeticion) values ("+entrenamiento.idusuario+",2,STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s',1)); ";
             console.log(sql);
             mysqlConnection.query(sql,(err, rows,fields)=>{
               if(!err){
@@ -1736,7 +1736,7 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
     
       var usuario = req.body;
   
-        var sql = "select re.entrenamiento_identrenamiento as identrenamiento,p.peso*0.453592 as peso , sum(re.volumen) as TotalInhalado,sum(re.volumen)*0.21 as porcentajeTotalOxigeno,(sum(re.volumen)*0.21)/5 as porcentajeOxigenoMinuto,  ((sum(re.volumen)*0.21)/5)/(p.peso*0.453592) as vo2MAX from entrenamiento as en, volumen as re, (select peso from usuario where idusuario = "+usuario.idusuario +") as p     where en.identrenamiento = re.entrenamiento_identrenamiento     and en.identrenamiento = "+usuario.identrenamiento +" and re.volumen is not null and re.volumen > 0  group by re.entrenamiento_identrenamiento, peso;";  
+        var sql = "select re.entrenamiento_identrenamiento as identrenamiento,p.peso*0.453592 as peso , sum(re.volumen) as TotalInhalado,sum(re.volumen)*0.21 as porcentajeTotalOxigeno,(sum(re.volumen)*0.21)/en.repeticion as porcentajeOxigenoMinuto,  ((sum(re.volumen)*0.21)/en.repeticion)/(p.peso*0.453592) as vo2MAX from entrenamiento as en, volumen as re, (select peso from usuario where idusuario = "+usuario.idusuario +") as p     where en.identrenamiento = re.entrenamiento_identrenamiento     and en.identrenamiento = "+usuario.identrenamiento +" and re.volumen is not null and re.volumen > 0  group by re.entrenamiento_identrenamiento, peso;";  
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
           if(!err){
