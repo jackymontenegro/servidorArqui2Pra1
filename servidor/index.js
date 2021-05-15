@@ -14,13 +14,13 @@ app.use(express.json());
 var mysql1 = require('mysql');
 var mysqlConnection = mysql1.createConnection({
   host: "127.0.0.1",
-  user: "arqui",
+ /* user: "arqui",
   password: "arquipractica1",
-  database: "mydb"
-
-  /*user: "jmontenegro",
-  password: "123456",
   database: "mydb"*/
+
+  user: "root",
+  password: "password",
+  database: "mydb"
 
 });
 
@@ -1787,5 +1787,384 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
         });
     });
 
+    app.post('/medidaTemp/', function(req, res){ // temperature
 
+      /*estado= 
+      1(inicia prueba)
+      2(en prueba)
+      3(finaliza prueba)
+          {
+          "idusuario": 2,
+          "estado": 2,
+          "bpm": 5.1,
+          "temperatura": 5.1,    
+          "fecha": "01012013 113010"
+          }
+        */   
+    
+      var entrenamiento = req.body;
+      console.log(req.body);
+      //res.json( [{"status":1}] );
+    
+      
+      if(parseInt(entrenamiento.estado)== 1){//inicia prueba
+    
+        var sql = "insert into entrenamiento (usuario_idusuario,estado,fecha,repeticion) values ("+entrenamiento.idusuario+",2,STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'),1); ";
+        console.log(sql);
+        mysqlConnection.query(sql,(err, rows,fields)=>{
+          if(!err){
+    
+    
+            
+    
+            var sql1 = "insert into calorias (cantidad,fecha, entrenamiento_identrenamiento)  select 0, STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'), identrenamiento  from entrenamiento  order by identrenamiento desc  limit 1;";
+            console.log(sql1);
+            mysqlConnection.query(sql1,(err, rows,fields)=>{
+              if(!err){
+                res.json( [{"status":1}] );
+              }else{
+                console.log(err);
+                res.json( [{"status":0}] );
+              }
+            });
+            
+          }else{
+              console.log(err);
+              res.json( [{"status":0}] );
+          }
+        });
+    
+      }else if(parseInt(entrenamiento.estado)== 2){// en prueba
+    
+      
+        
+        var sql = `select u.sexo ,TIMEDIFF(STR_TO_DATE('${entrenamiento.fecha}','%d%m%Y %H%i%s'),e.fecha ) as tiempo, u.edad, u.peso, u.altura from entrenamiento e, usuario u 
+                  where e.usuario_idusuario = u.idusuario and e.identrenamiento = (select identrenamiento from entrenamiento  order by identrenamiento desc  limit 1) 
+                  and e.usuario_idusuario = ${entrenamiento.idusuario};`;
+        console.log(sql);
+    
+        
+        mysqlConnection.query(sql,(err, rows,fields)=>{
+          if(!err){
+            
+    
+            let weight = parseInt(rows[0].peso)/2.20462;
+            let age = parseInt(rows[0].edad);
+            let sexo = rows[0].sexo;
+    
+            let time = rows[0].tiempo.split(":");
+            console.log(time);
+            let hour = parseInt(time[0]);
+            let mins = parseInt(time[1])/60;
+            let seconds = parseInt(time[2])/3600;
+
+        let totaltime = hour+mins+seconds;
+
+            console.log(totaltime);
+    
+            let calories = 0;
+            if(rows[0].sexo === 'm'){
+              calories = ((-55.0969 + (0.6309 * entrenamiento.bpm) + (0.1988 * weight) + (0.2017 * age))/4.184) * 60 * totaltime;
+
+    
+            }else{
+              calories = ((-20.4022 + (0.4472 * entrenamiento.bpm) + (0.1263 * weight) + (0.074 * age))/4.184) * 60 * totaltime;
+            }
+    
+    
+            console.log(calories);
+            console.log(entrenamiento.bpm);
+            console.log(weight);
+            console.log(age);
+            console.log(rows[0]);
+    
+               
+                var sql1 = "insert into calorias (cantidad, entrenamiento_identrenamiento,fecha)  select "+calories+", identrenamiento, STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s')     from entrenamiento  order by identrenamiento desc  limit 1;";
+                console.log(sql1);
+                mysqlConnection.query(sql1,(err, rows,fields)=>{
+                  if(!err){
+                    res.json( [{"status":1}] );
+                  
+                  }else{
+                    console.log(err);
+                    res.json( [{"status":0}] );
+                  }
+                });
+            
+            
+          }else{
+            console.log(err);
+            res.json( [{"estado":0}] );
+          }
+        });
+    
+    
+      }else if(parseInt(entrenamiento.estado)== 3){//finalizar
+        //estado 8 = finalizado para calorias
+        var sql1 = " update entrenamiento as re,  (select identrenamiento as ultimoid  from entrenamiento  order by identrenamiento desc  limit 1) as uen set re.fecha = STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'), re.estado = 8  where re.identrenamiento = uen.ultimoid;";
+        console.log(sql1);
+        mysqlConnection.query(sql1,(err, rows,fields)=>{
+          if(!err){
+            res.json( [{"status":1}] );
+          }else{
+            console.log(err);
+            res.json( [{"status":0}] );
+          }
+        });
+    
+      }
+    
+    });
+    
+    
+    
+    app.post('/reporteDia/', function(req, res){ // daily
+    
+      /*
+          {
+          "idusuario": 2,
+          "kilos": 2,
+          }
+        */   
+    
+      var entrenamiento = req.body;
+    
+      
+    
+      var sql = `SELECT sum(cantidad) as calorias from calorias inner join
+      entrenamiento on calorias.entrenamiento_identrenamiento = entrenamiento.identrenamiento
+       where calorias.idcalorias in 
+      (select  max(idcalorias) from calorias group by entrenamiento_identrenamiento) 
+      and date(calorias.fecha) = date(now())
+      and entrenamiento.usuario_idusuario = ${entrenamiento.idusuario}
+      order by calorias.idcalorias ; `;
+    
+    
+    
+    mysqlConnection.query(sql,(err, rows,fields)=>{
+    if(!err){
+    
+      console.log(rows[0]);
+      if(rows[0].calorias == null){
+        res.json( [{"calorias":0}] );
+      }else{
+        res.json( [{"calorias":rows[0].calorias}] );
+      }
+      
+    
+    
+    }else{
+    console.log(err);
+    res.json( [{"estado":0}] );
+    }
+    });
+    
+      
+    });
+    
+    app.post('/reporteSemana/', function(req, res){ // daily
+    
+      /*
+          {
+          "idusuario": 2
+          }
+        */   
+    
+      var entrenamiento = req.body;
+    
+      
+    
+      var sql = `SELECT sum(cantidad) as calorias,  dayname(calorias.fecha) as day from calorias  inner join
+      entrenamiento on calorias.entrenamiento_identrenamiento = entrenamiento.identrenamiento
+       where calorias.idcalorias in 
+      (select  max(idcalorias) from calorias group by entrenamiento_identrenamiento) 
+      and entrenamiento.usuario_idusuario = ${entrenamiento.idusuario}
+      group by date(calorias.fecha)
+      order by calorias.idcalorias ; 
+       `;
+    
+    
+    
+    mysqlConnection.query(sql,(err, rows,fields)=>{
+
+      var arraytimes = [];
+          var arraymed = [];
+          var array = [];
+    
+    
+         // Object.entries(rows).forEach(([key, value]) => console.log(`${key}: ${value.ritmo}`));
+          Object.entries(rows).forEach(([key, value]) => arraymed.push(value.calorias));
+    
+         // Object.entries(rows).forEach(([key, value]) => console.log(`${key}: ${value.fecha}`));
+          Object.entries(rows).forEach(([key, value]) => arraytimes.push(value.day));
+    
+          array.push(arraytimes);
+          array.push(arraymed);
+    
+          console.log(array);
+          var myJSON = JSON.stringify(array);
+          console.log(myJSON);
+
+          if(!err){
+          res.json( array);
+    
+          
+        }else{
+            console.log(err);
+            res.json(array);
+      }
+
+    });
+    
+      
+    });
+    
+    
+    
+    app.post('/caloriasDiaria/', function(req, res){ // daily
+    
+      /*
+          {
+          "idusuario": 2
+          }
+        */   
+    
+      var entrenamiento = req.body;
+    
+      
+    
+      var sql = `select u.sexo , u.edad, u.peso, u.altura from entrenamiento e, usuario u 
+      where e.identrenamiento = (select identrenamiento from entrenamiento  order by identrenamiento desc  limit 1)
+      and e.usuario_idusuario = ${entrenamiento.idusuario}; 
+       `;
+    
+    
+    
+    mysqlConnection.query(sql,(err, rows,fields)=>{
+    if(!err){
+    
+      let weight = parseInt(rows[0].peso)/2.20462;
+      let age = parseInt(rows[0].edad);
+      let sexo = rows[0].sexo;
+     
+      console.log(rows);
+    /*
+      let alturaarray = rows[0].altura.split(".");
+      let metros = parseInt(altura[0]) * 100;
+    
+      let totalaltura = metros + parseInt(altura[1]);
+    
+    
+      console.log(totalaltura);
+    */
+     
+    
+    
+    
+    }else{
+    console.log(err);
+    res.json( [{"estado":0}] );
+    }
+    });
+    
+      
+    });
+
+    app.post('/prue/', function(req, res){/*
+      ● Medición final de vo2 max.*/
   
+      /*
+        {
+        "idusuario": 2,
+        "identrenamiento": 2
+        }
+        */
+    
+      var usuario = req.body;
+  
+        var sql = "select re.entrenamiento_identrenamiento as identrenamiento,p.peso*0.453592 as peso , sum(re.volumen) as TotalInhalado,sum(re.volumen)*0.21 as porcentajeTotalOxigeno,(sum(re.volumen)*0.21)/en.repeticion as porcentajeOxigenoMinuto,  ((sum(re.volumen)*0.21)/en.repeticion)/(p.peso*0.453592) as vo2MAX from entrenamiento as en, volumen as re, (select peso from usuario where idusuario = "+usuario.idusuario +") as p     where en.identrenamiento = re.entrenamiento_identrenamiento     and en.identrenamiento = "+usuario.identrenamiento +" and re.volumen is not null and re.volumen > 0  group by re.entrenamiento_identrenamiento, peso;";  
+        console.log(sql);
+        mysqlConnection.query(sql,(err, rows,fields)=>{
+          if(!err){
+
+          res.json( rows);
+    
+          
+        }else{
+            console.log(err);
+            res.json( [{
+              "identrenamiento": 0,
+              "peso": 0,
+              "TotalInhalado": 0,
+              "porcentajeTotalOxigeno": 0,
+              "porcentajeOxigenoMinuto": 0,
+              "vo2MAX": 0}] );
+      }
+        });
+    });
+  
+    app.post('/actualizarpeso/', function(req, res){/*Usuario agrega su peso*/
+  
+      /*
+        {
+        "idusuario": 2,
+        "peso": 150.2
+        }
+        */
+    
+      var usuario = req.body;
+  
+        var sql = "insert into peso (usuario_idusuario,peso, fecha) values ("+parseInt( usuario.idusuario)+","+parseFloat( usuario.peso)+",date(now()));";  
+        console.log(sql);
+        mysqlConnection.query(sql,(err, rows,fields)=>{
+          if(!err){
+            res.json( [{"status":1}] );
+          }else{
+            console.log(err);
+            res.json( [{"status":0}] );
+          }
+        });
+    });
+
+    app.post('/pesoReporte/', function(req, res){ //velocidad en tiempo real
+
+      /*
+        {
+        "idusuario": 2
+        }
+        */
+    
+      var usuario = req.body;
+  
+        var sql = "select cast(fecha as char) as fecha, peso from peso where usuario_idusuario = "+usuario.idusuario;
+        console.log(sql);
+        mysqlConnection.query(sql,(err, rows,fields)=>{
+
+          var arraytimes = [];
+          var arraymed = [];
+          var array = [];
+    
+    
+         // Object.entries(rows).forEach(([key, value]) => console.log(`${key}: ${value.ritmo}`));
+          Object.entries(rows).forEach(([key, value]) => arraymed.push(value.peso));
+    
+         // Object.entries(rows).forEach(([key, value]) => console.log(`${key}: ${value.fecha}`));
+          Object.entries(rows).forEach(([key, value]) => arraytimes.push(value.fecha));
+    
+          array.push(arraytimes);
+          array.push(arraymed);
+    
+          console.log(array);
+          var myJSON = JSON.stringify(array);
+          console.log(myJSON);
+
+          if(!err){
+          res.json( array);
+    
+          
+        }else{
+            console.log(err);
+            res.json(array);
+      }
+        });
+    });

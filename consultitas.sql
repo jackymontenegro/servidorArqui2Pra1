@@ -5,12 +5,14 @@ DROP DATABASE mydb;
 insert into tipo (tipo) values ('entrenador');
 insert into tipo (tipo) values ('atleta');
 
+alter table usuario
+add column	edad INT DEFAULT NULL;
 
 insert into usuario (nombre,tipo_idtipo,correo,contra) 
 values ('Sin Entrenador',1,'prueba@gmail.com','123');
 
-insert into usuario (nombre,apellido, fechaNacimiento,sexo, peso,altura,tipo_idtipo,correo,contra,usuario_idusuario) 
-values ('jackelin','montenegro',STR_TO_DATE('19/04/1999','%d/%m/%Y'),'h',155,168,1,'prueba2@gmail.com','123',1);
+insert into usuario (nombre,apellido, fechaNacimiento,sexo, peso,altura,tipo_idtipo,correo,contra,usuario_idusuario,edad) 
+values ('jackelin','montenegro',STR_TO_DATE('19/04/1999','%d/%m/%Y'),'h',155,168,1,'prueba2@gmail.com','123',1,22);
 
 insert into usuario (nombre,apellido, fechaNacimiento,sexo, peso,altura,tipo_idtipo,correo,contra,usuario_idusuario) 
 values ('julio','lopez',STR_TO_DATE('19/04/1999','%d/%m/%Y'),'m',155,168,2,'prueba3@gmail.com','123',1);
@@ -316,7 +318,13 @@ from entrenamiento as en, volumen as re
 where en.identrenamiento = re.entrenamiento_identrenamiento   
 and en.identrenamiento = "+usuario.identrenamiento +" and re.volumen is not null  group by re.entrenamiento_identrenamiento;
 
+SELECT * FROM usuario;
+select * from entrenamiento;
+select * from calorias;
 
+select u.sexo ,TIMEDIFF(STR_TO_DATE('14052021 151620','%d%m%Y %H%i%s'),e.fecha ) as tiempo, u.edad, u.peso, u.altura from entrenamiento e, usuario u 
+                  where e.identrenamiento = (select identrenamiento from entrenamiento  order by identrenamiento desc  limit 1)
+                  and e.usuario_idusuario = 2;
 
 
 
