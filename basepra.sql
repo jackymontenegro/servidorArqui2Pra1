@@ -45,9 +45,9 @@ CREATE TABLE IF NOT EXISTS `mydb`.`usuario` (
   `status` INT(11) NULL DEFAULT 1,
   `sexo` VARCHAR(4) NULL,
   PRIMARY KEY (`idusuario`),
-  INDEX `fk_usuario_tipo1_idx` (`tipo_idtipo` ASC) VISIBLE,
-  INDEX `fk_usuario_usuario1_idx` (`usuario_idusuario` ASC) VISIBLE,
-  UNIQUE INDEX `correo_UNIQUE` (`correo` ASC) VISIBLE,
+  INDEX `fk_usuario_tipo1_idx` (`tipo_idtipo` ASC) ,
+  INDEX `fk_usuario_usuario1_idx` (`usuario_idusuario` ASC) ,
+  UNIQUE INDEX `correo_UNIQUE` (`correo` ASC) ,
   CONSTRAINT `fk_usuario_tipo1`
     FOREIGN KEY (`tipo_idtipo`)
     REFERENCES `mydb`.`tipo` (`idtipo`)
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`ritmo` (
   `usuario_idusuario` INT NOT NULL,
   `fecha` DATETIME NULL,
   PRIMARY KEY (`idritmo`),
-  INDEX `fk_ritmo_usuario_idx` (`usuario_idusuario` ASC) VISIBLE,
+  INDEX `fk_ritmo_usuario_idx` (`usuario_idusuario` ASC)  ,
   CONSTRAINT `fk_ritmo_usuario`
     FOREIGN KEY (`usuario_idusuario`)
     REFERENCES `mydb`.`usuario` (`idusuario`)
@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`oxigeno` (
   `usuario_idusuario` INT NOT NULL,
   `fecha` DATETIME NULL,
   PRIMARY KEY (`idoxigeno`),
-  INDEX `fk_oxigeno_usuario1_idx` (`usuario_idusuario` ASC) VISIBLE,
+  INDEX `fk_oxigeno_usuario1_idx` (`usuario_idusuario` ASC)  ,
   CONSTRAINT `fk_oxigeno_usuario1`
     FOREIGN KEY (`usuario_idusuario`)
     REFERENCES `mydb`.`usuario` (`idusuario`)
@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`temperatura` (
   `usuario_idusuario` INT NOT NULL,
   `fecha` DATETIME NULL,
   PRIMARY KEY (`idtemperatura`),
-  INDEX `fk_temperatura_usuario1_idx` (`usuario_idusuario` ASC) VISIBLE,
+  INDEX `fk_temperatura_usuario1_idx` (`usuario_idusuario` ASC)  ,
   CONSTRAINT `fk_temperatura_usuario1`
     FOREIGN KEY (`usuario_idusuario`)
     REFERENCES `mydb`.`usuario` (`idusuario`)
@@ -126,7 +126,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`entrenamiento` (
   `estado` INT NULL DEFAULT 0,
   `fecha` DATETIME NULL,
   PRIMARY KEY (`identrenamiento`),
-  INDEX `fk_entrenamiento_usuario1_idx` (`usuario_idusuario` ASC) VISIBLE,
+  INDEX `fk_entrenamiento_usuario1_idx` (`usuario_idusuario` ASC)  ,
   CONSTRAINT `fk_entrenamiento_usuario1`
     FOREIGN KEY (`usuario_idusuario`)
     REFERENCES `mydb`.`usuario` (`idusuario`)
@@ -150,7 +150,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`repeticion` (
   `distanciaTotal` DOUBLE NULL,
   `velocidad` DOUBLE NULL,
   PRIMARY KEY (`idrepeticion`),
-  INDEX `fk_repeticion_entrenamiento1_idx` (`entrenamiento_identrenamiento` ASC) VISIBLE,
+  INDEX `fk_repeticion_entrenamiento1_idx` (`entrenamiento_identrenamiento` ASC)  ,
   CONSTRAINT `fk_repeticion_entrenamiento1`
     FOREIGN KEY (`entrenamiento_identrenamiento`)
     REFERENCES `mydb`.`entrenamiento` (`identrenamiento`)
@@ -169,7 +169,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`volumen` (
   `entrenamiento_identrenamiento` INT NOT NULL,
   `periodo` INT NULL DEFAULT NULL,
   PRIMARY KEY (`idvolumen`),
-  INDEX `fk_volumen_entrenamiento1_idx` (`entrenamiento_identrenamiento` ASC) VISIBLE,
+  INDEX `fk_volumen_entrenamiento1_idx` (`entrenamiento_identrenamiento` ASC)  ,
   CONSTRAINT `fk_volumen_entrenamiento1`
     FOREIGN KEY (`entrenamiento_identrenamiento`)
     REFERENCES `mydb`.`entrenamiento` (`identrenamiento`)
@@ -188,7 +188,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`calorias` (
   `periodo` INT NULL,
   `entrenamiento_identrenamiento` INT NOT NULL,
   PRIMARY KEY (`idcalorias`),
-  INDEX `fk_calorias_entrenamiento1_idx` (`entrenamiento_identrenamiento` ASC) VISIBLE,
+  INDEX `fk_calorias_entrenamiento1_idx` (`entrenamiento_identrenamiento` ASC)  ,
   CONSTRAINT `fk_calorias_entrenamiento1`
     FOREIGN KEY (`entrenamiento_identrenamiento`)
     REFERENCES `mydb`.`entrenamiento` (`identrenamiento`)
@@ -206,7 +206,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`peso` (
   `usuario_idusuario` INT NOT NULL,
   `fecha` DATE NULL,
   PRIMARY KEY (`idpeso`),
-  INDEX `fk_peso_usuario1_idx` (`usuario_idusuario` ASC) VISIBLE,
+  INDEX `fk_peso_usuario1_idx` (`usuario_idusuario` ASC)  ,
   CONSTRAINT `fk_peso_usuario1`
     FOREIGN KEY (`usuario_idusuario`)
     REFERENCES `mydb`.`usuario` (`idusuario`)
