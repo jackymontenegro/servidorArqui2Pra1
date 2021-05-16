@@ -14,7 +14,7 @@ app.use(express.json());
 var mysql1 = require('mysql');
 var mysqlConnection = mysql1.createConnection({
   host: "127.0.0.1",
-  user: "arqui",
+ user: "arqui",
   password: "arquipractica1",
   database: "mydb"
 
@@ -2205,7 +2205,7 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
           if(!err){
 
             var sql1 = "update usuario set peso = "+parseFloat( usuario.peso)+" where idusuario=  "+parseInt( usuario.idusuario)+";";  
-            console.log(sql);
+            console.log(sql1);
             mysqlConnection.query(sql1,(err, rows1,fields)=>{
               if(!err){
                 res.json( [{"status":1}] );
@@ -2215,7 +2215,7 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
               }
             });
 
-            res.json( [{"status":1}] );
+     
           }else{
             console.log(err);
             res.json( [{"status":0}] );
