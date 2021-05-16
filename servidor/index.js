@@ -2065,9 +2065,7 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
       (select  max(idcalorias) from calorias group by entrenamiento_identrenamiento) 
       and entrenamiento.usuario_idusuario = ${entrenamiento.idusuario}
       group by dayname(calorias.fecha)
-      order by calorias.idcalorias ; 
-       `;
-    
+      order by dayname(calorias.fecha) desc ;        `;    
     
     
     mysqlConnection.query(sql,(err, rows,fields)=>{
