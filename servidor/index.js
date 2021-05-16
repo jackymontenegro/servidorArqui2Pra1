@@ -2203,6 +2203,18 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
           if(!err){
+
+            var sql1 = "update usuario set peso = "+parseFloat( usuario.peso)+" where idusuario=  "+parseInt( usuario.idusuario)+";";  
+            console.log(sql);
+            mysqlConnection.query(sql1,(err, rows1,fields)=>{
+              if(!err){
+                res.json( [{"status":1}] );
+              }else{
+                console.log(err);
+                res.json( [{"status":0}] );
+              }
+            });
+
             res.json( [{"status":1}] );
           }else{
             console.log(err);
