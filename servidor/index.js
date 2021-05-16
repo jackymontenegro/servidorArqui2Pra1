@@ -14,13 +14,13 @@ app.use(express.json());
 var mysql1 = require('mysql');
 var mysqlConnection = mysql1.createConnection({
   host: "127.0.0.1",
-  user: "arqui",
+ /* user: "arqui",
   password: "arquipractica1",
-  database: "mydb"
-
-  /*user: "root",
-  password: "password",
   database: "mydb"*/
+
+  user: "root",
+  password: "password",
+  database: "mydb"
 
 });
 
@@ -1917,21 +1917,51 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
     });
     
     
-    
     app.post('/reporteDia/', function(req, res){ // daily
     
       /*
           {
           "idusuario": 2,
-          "kilos": 2,
+          "caloriasNecesita": 2500,
           }
         */   
     
       var entrenamiento = req.body;
     
+      var respuesta = {
+        calorias_hoy: 0,
+        calorias_faltantes: 0,
+        calorias_mañana: 500,
+        tipo: '',
+        recetas: ''
+        
+    };
+
+    var receta3 = {
+      calorias: 2200,
+      desayuno: '1 taza (250 g) de requesón sin grasa, 1 taza (80 g) de fresas, Canela en polvo, 1 rodaja de pan integral con: 3 onzas (85 gm) de rebanadas de pavo',
+      almuerzo: 'Hojas verdes (lechuga, espinaca) – cualquier cantidad, 2 tazas (160 g) de vegetales mixtos cortados (zanahorias, pimientos, tomates), 6 onzas (170 g) de pechuga de pollo asada,  ½ taza (150 g) de frijoles blancos cocinados,  2 cucharadas (30 g) de aderezo para ensaladas bajo en grasa,  1 mandarina',
+      cena: '8 onzas (200 g) de salmón asado con limón, 2 tazas (160 g) de judías verdes al vapor con ajo,  1 taza (300 g) de arroz integral cocinado, Ensalada verde grande – cualquier cantidad, ¼ de aguacate mediano para la ensalada,  2 cucharadas (30 g) de aderezo para ensaladas bajo en calorías'
       
+    };
+
+    var receta2 = {
+      calorias: 1800,
+      desayuno: '1 taza (250 g) de requesón sin grasa, 1 taza (80 g) de fresas, Espolvoreado con canela',
+      almuerzo: 'Verduras de hoja verde (lechuga, espinaca): cualquier cantidad, 2 tazas (160 g) de verduras mixtas picadas (zanahorias, pimientos, tomate), 6 onzas (170 g) de  pechuga de pollo a la parrilla, ½ taza (150 g) de frijoles blancos cocidos,  2 cucharadas (30 g)  de aderezo para ensaladas bajo en calorías,  1 mandarina',
+      cena: '8 onzas (200 g) de salmón a la parrilla con limón,  2 tazas (160 g) de ejotes al vapor con ajo,  ½ taza (150 g) de arroz integral cocido, ensalada grande de hojas verdes, cualquier cantidad, 2 cucharadas (30 g) de aderezo para ensaladas reducido en calorías'
+      
+    };
+
+    var receta1 = {
+      calorias: 1600,
+      desayuno: '1 rebanada de pan integral, 1/2 aguacate mediano, 1 huevo grande, cocido en 1/4 cucharadita',
+      almuerzo: ' 2 tazas de sopa de ravioles y verduras, 2 rebanadas diagonales de baguette (1/4 de pulgada de grosor), preferiblemente de trigo integral, 2 cucharadas. queso cheddar rallado',
+      cena: '4 oz. salmón al horno, 1 taza de coles de Bruselas asadas, 3/4 taza de arroz integral, 1/8 cucharadita. sal, 1/8 cucharadita. pimienta, 1 cucharada. nueces'
+      
+    };
     
-      var sql = `SELECT sum(cantidad) as calorias from calorias inner join
+      var sql = `SELECT round(sum(cantidad),2) as calorias from calorias inner join
       entrenamiento on calorias.entrenamiento_identrenamiento = entrenamiento.identrenamiento
        where calorias.idcalorias in 
       (select  max(idcalorias) from calorias group by entrenamiento_identrenamiento) 
@@ -1946,9 +1976,64 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
     
       console.log(rows[0]);
       if(rows[0].calorias == null){
+        console.log('vacio')
         res.json( [{"calorias":0}] );
       }else{
-        res.json( [{"calorias":rows[0].calorias}] );
+
+        
+        var sql1 = `select final.promedio_tiempo, (case  when minute(final.promedio_tiempo) < 30 and hour(final.promedio_tiempo) < 1 then 'sedentario' 
+        when minute(final.promedio_tiempo) > 30 and minute(final.promedio_tiempo) < 40 and hour(final.promedio_tiempo) < 1 then 'ligeramente activo' 
+        when minute(final.promedio_tiempo) > 40 and minute(final.promedio_tiempo) < 59 and hour(final.promedio_tiempo) < 1 then 'moderadamente activo'
+        when hour(final.promedio_tiempo) > 0 then 'muy activo'
+        end) as factor_actividad,
+        (case  when minute(final.promedio_tiempo) < 30 and hour(final.promedio_tiempo) < 1 then 1.2
+        when minute(final.promedio_tiempo) > 30 and minute(final.promedio_tiempo) < 40 and hour(final.promedio_tiempo) < 1 then 1.375
+        when minute(final.promedio_tiempo) > 40 and minute(final.promedio_tiempo) < 59 and hour(final.promedio_tiempo) < 1 then 1.55
+        when hour(final.promedio_tiempo) > 0 then 1.725
+        end) as cantidad_factor_actividad
+        from
+        (select cast(SEC_TO_TIME(avg(time_to_sec(ta.tiempo))) as time) promedio_tiempo from
+        (select mi.ff as fecha,  SEC_TO_TIME(sum(time_to_sec(timediff(ma.f,mi.f)))) as tiempo from
+        (select cast(fecha as date) as ff, entrenamiento_identrenamiento as e, min(fecha) as f from calorias
+        group by entrenamiento_identrenamiento, cast(fecha as date)  ) as mi,
+        (select cast(fecha as date) as ff,entrenamiento_identrenamiento as e, max(fecha) as f from calorias
+        group by entrenamiento_identrenamiento,cast(fecha as date)) as ma
+        where mi.e = ma.e
+        group by mi.ff , ma.ff
+        order by mi.ff asc) as ta) final;`;
+          console.log(sql1);
+        mysqlConnection.query(sql1,(err, rows1,fields)=>{
+          if(!err){
+        console.log(rows1);
+         // res.json( rows);
+         if(entrenamiento.calorias <= 1600){
+          respuesta.recetas = receta1;
+         }else if(entrenamiento.calorias > 1600 && entrenamiento.calorias <= 1800){
+          respuesta.recetas = receta2;
+         }else if(entrenamiento.calorias > 1800){
+          respuesta.recetas = receta3;
+        }
+
+
+         respuesta.tipo = rows1[0];
+         console.log('correcto')
+        respuesta.calorias_hoy = rows[0].calorias;
+
+        if(respuesta.calorias_hoy < 500){
+          respuesta.calorias_faltantes = 500-parseFloat (respuesta.calorias_hoy)
+          respuesta.calorias_mañana = (respuesta.calorias_faltantes)+500
+        }
+        
+        res.json( respuesta );
+          
+        }else{
+            console.log(err);
+            res.send( 'error' );
+      }
+
+
+        });
+        
       }
       
     
@@ -2147,6 +2232,49 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
     
          // Object.entries(rows).forEach(([key, value]) => console.log(`${key}: ${value.ritmo}`));
           Object.entries(rows).forEach(([key, value]) => arraymed.push(value.peso));
+    
+         // Object.entries(rows).forEach(([key, value]) => console.log(`${key}: ${value.fecha}`));
+          Object.entries(rows).forEach(([key, value]) => arraytimes.push(value.fecha));
+    
+          array.push(arraytimes);
+          array.push(arraymed);
+    
+          console.log(array);
+          var myJSON = JSON.stringify(array);
+          console.log(myJSON);
+
+          if(!err){
+          res.json( array);
+    
+          
+        }else{
+            console.log(err);
+            res.json(array);
+      }
+        });
+    });
+
+    app.post('/caloriasTR/', function(req, res){ //velocidad en tiempo real
+
+      /*
+        {
+        "idusuario": 2
+        }
+        */
+    
+      var usuario = req.body;
+  
+        var sql ="select a.calorias, a.hora as fecha from (select  cantidad as calorias , idcalorias, cast(fecha as time) as hora from calorias where cantidad > 0 and entrenamiento_identrenamiento = (select identrenamiento as ultimoid  from entrenamiento  order by identrenamiento desc  limit 1) order by idcalorias desc  limit 10) as a order by a.idcalorias asc;";
+        console.log(sql);
+        mysqlConnection.query(sql,(err, rows,fields)=>{
+
+          var arraytimes = [];
+          var arraymed = [];
+          var array = [];
+    
+    
+         // Object.entries(rows).forEach(([key, value]) => console.log(`${key}: ${value.ritmo}`));
+          Object.entries(rows).forEach(([key, value]) => arraymed.push(value.calorias));
     
          // Object.entries(rows).forEach(([key, value]) => console.log(`${key}: ${value.fecha}`));
           Object.entries(rows).forEach(([key, value]) => arraytimes.push(value.fecha));

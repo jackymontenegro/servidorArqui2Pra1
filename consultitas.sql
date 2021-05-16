@@ -1,12 +1,14 @@
-use mydb;
 
 DROP DATABASE mydb;
+use mydb;
+
+
 
 insert into tipo (tipo) values ('entrenador');
 insert into tipo (tipo) values ('atleta');
 
 alter table usuario
-add column	edad INT DEFAULT NULL;
+add edad INT DEFAULT NULL;
 
 insert into usuario (nombre,tipo_idtipo,correo,contra) 
 values ('Sin Entrenador',1,'prueba@gmail.com','123');
@@ -321,14 +323,28 @@ and en.identrenamiento = "+usuario.identrenamiento +" and re.volumen is not null
 SELECT * FROM usuario;
 select * from entrenamiento;
 select * from calorias;
+SELECT * FROM peso;
 
-select u.sexo ,TIMEDIFF(STR_TO_DATE('14052021 151620','%d%m%Y %H%i%s'),e.fecha ) as tiempo, u.edad, u.peso, u.altura from entrenamiento e, usuario u 
-                  where e.identrenamiento = (select identrenamiento from entrenamiento  order by identrenamiento desc  limit 1)
-                  and e.usuario_idusuario = 2;
+select idusuario, date(now()) from usuario;
 
-
-
-
-
-
+select final.promedio_tiempo, (case  when minute(final.promedio_tiempo) < 30 and hour(final.promedio_tiempo) < 1 then 'sedentario' 
+when minute(final.promedio_tiempo) > 30 and minute(final.promedio_tiempo) < 40 and hour(final.promedio_tiempo) < 1 then 'ligeramente activo' 
+when minute(final.promedio_tiempo) > 40 and minute(final.promedio_tiempo) < 59 and hour(final.promedio_tiempo) < 1 then 'moderadamente activo'
+when hour(final.promedio_tiempo) > 0 then 'muy activo'
+end) as factor_actividad,
+(case  when minute(final.promedio_tiempo) < 30 and hour(final.promedio_tiempo) < 1 then 1.2
+when minute(final.promedio_tiempo) > 30 and minute(final.promedio_tiempo) < 40 and hour(final.promedio_tiempo) < 1 then 1.375
+when minute(final.promedio_tiempo) > 40 and minute(final.promedio_tiempo) < 59 and hour(final.promedio_tiempo) < 1 then 1.55
+when hour(final.promedio_tiempo) > 0 then 1.725
+end) as cantidad_factor_actividad
+from
+(select cast(SEC_TO_TIME(avg(time_to_sec(ta.tiempo))) as time) promedio_tiempo from
+(select mi.ff as fecha,  SEC_TO_TIME(sum(time_to_sec(timediff(ma.f,mi.f)))) as tiempo from
+(select cast(fecha as date) as ff, entrenamiento_identrenamiento as e, min(fecha) as f from calorias
+group by entrenamiento_identrenamiento, cast(fecha as date)  ) as mi,
+(select cast(fecha as date) as ff,entrenamiento_identrenamiento as e, max(fecha) as f from calorias
+group by entrenamiento_identrenamiento,cast(fecha as date)) as ma
+where mi.e = ma.e
+group by mi.ff , ma.ff
+order by mi.ff asc) as ta) final;
 
