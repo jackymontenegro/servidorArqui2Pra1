@@ -2077,22 +2077,22 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
           var array = [];
     
     
-         // Object.entries(rows).forEach(([key, value]) => console.log(`${key}: ${value.ritmo}`));
-          Object.entries(rows).forEach(([key, value]) => arraymed.push(value.calorias));
-    
-         // Object.entries(rows).forEach(([key, value]) => console.log(`${key}: ${value.fecha}`));
-          Object.entries(rows).forEach(([key, value]) => arraytimes.push(value.day));
-    
-          array.push(arraytimes);
-          array.push(arraymed);
-    
-          console.log(array);
-          var myJSON = JSON.stringify(array);
-          console.log(myJSON);
+         
 
           if(!err){
           res.json( array);
+    // Object.entries(rows).forEach(([key, value]) => console.log(`${key}: ${value.ritmo}`));
+    Object.entries(rows).forEach(([key, value]) => arraymed.push(value.calorias));
     
+    // Object.entries(rows).forEach(([key, value]) => console.log(`${key}: ${value.fecha}`));
+     Object.entries(rows).forEach(([key, value]) => arraytimes.push(value.day));
+
+     array.push(arraytimes);
+     array.push(arraymed);
+
+     console.log(array);
+     var myJSON = JSON.stringify(array);
+     console.log(myJSON);
           
         }else{
             console.log(err);
