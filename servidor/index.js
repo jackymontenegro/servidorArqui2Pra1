@@ -2064,7 +2064,7 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
        where calorias.idcalorias in 
       (select  max(idcalorias) from calorias group by entrenamiento_identrenamiento) 
       and entrenamiento.usuario_idusuario = ${entrenamiento.idusuario}
-      group by date(calorias.fecha)
+      group by dayname(calorias.fecha)
       order by calorias.idcalorias ; 
        `;
     
@@ -2080,7 +2080,7 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
          
 
           if(!err){
-          res.json( array);
+          
     // Object.entries(rows).forEach(([key, value]) => console.log(`${key}: ${value.ritmo}`));
     Object.entries(rows).forEach(([key, value]) => arraymed.push(value.calorias));
     
@@ -2093,7 +2093,7 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
      console.log(array);
      var myJSON = JSON.stringify(array);
      console.log(myJSON);
-          
+     res.json( array);
         }else{
             console.log(err);
             res.json(array);
