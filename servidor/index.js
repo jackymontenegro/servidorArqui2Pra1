@@ -2201,7 +2201,7 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
     
       var usuario = req.body;
   
-        var sql = "select distinct cast(fecha as char) as fecha, peso from peso where usuario_idusuario = "+parseInt(usuario.idusuario) ;
+        var sql = "select distinct dayname(fecha) as fecha, peso from peso where usuario_idusuario = "+parseInt(usuario.idusuario) ;
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
 
