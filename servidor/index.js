@@ -14,13 +14,13 @@ app.use(express.json());
 var mysql1 = require('mysql');
 var mysqlConnection = mysql1.createConnection({
   host: "127.0.0.1",
- user: "arqui",
+ /*user: "arqui",
   password: "arquipractica1",
-  database: "mydb"
-
-  /*user: "root",
-  password: "password",
   database: "mydb"*/
+
+  user: "root",
+  password: "password",
+  database: "mydb"
 
 });
 
@@ -1883,7 +1883,23 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
                 console.log(sql1);
                 mysqlConnection.query(sql1,(err, rows,fields)=>{
                   if(!err){
-                    res.json( [{"status":1}] );
+
+                    
+                      var sql5 = "insert into ritmo (ritmo, usuario_idusuario,fecha) values ("+entrenamiento.bpm+","+entrenamiento.idusuario+",STR_TO_DATE('"+entrenamiento.fecha+"','%d%m%Y %H%i%s'));";
+                      console.log(sql);
+                      mysqlConnection.query(sql5,(err, rows5,fields)=>{
+                        if(!err){
+
+                        res.json( [{"status":1}] );
+                  
+                        
+                      }else{
+                          console.log(err);
+                          res.json( [{"status":0}] );
+                    }
+                      });
+                    
+                    //res.json( [{"status":1}] );
                   
                   }else{
                     console.log(err);
