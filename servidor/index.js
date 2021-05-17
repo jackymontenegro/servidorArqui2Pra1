@@ -2229,7 +2229,7 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
     
       var usuario = req.body;
   
-        var sql = "select  dayname(fecha) as fecha, min(peso) as peso from peso where idpeso > 1 usuario_idusuario = "+parseInt(usuario.idusuario)+" group by  dayname(fecha)" ;
+        var sql = "select  dayname(fecha) as fecha, min(peso) as peso from peso where idpeso > 1 and usuario_idusuario = "+parseInt(usuario.idusuario)+" group by  dayname(fecha)" ;
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
 
