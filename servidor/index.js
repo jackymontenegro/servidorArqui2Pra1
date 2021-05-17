@@ -14,13 +14,13 @@ app.use(express.json());
 var mysql1 = require('mysql');
 var mysqlConnection = mysql1.createConnection({
   host: "127.0.0.1",
- user: "arqui",
+ /*user: "arqui",
   password: "arquipractica1",
-  database: "mydb"
-
-  /*user: "root",
-  password: "password",
   database: "mydb"*/
+
+  user: "root",
+  password: "password",
+  database: "mydb"
 
 });
 
@@ -1929,6 +1929,7 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
       var entrenamiento = req.body;
     
       var respuesta = {
+        dia: '',
         calorias_hoy: 0,
         calorias_faltantes: 0,
         calorias_mañana: 500,
@@ -1961,7 +1962,7 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
       
     };
     
-      var sql = `SELECT round(sum(cantidad),2) as calorias from calorias inner join
+      var sql = `SELECT round(sum(cantidad),2) as calorias, dayname(now()) as dia from calorias inner join
       entrenamiento on calorias.entrenamiento_identrenamiento = entrenamiento.identrenamiento
        where calorias.idcalorias in 
       (select  max(idcalorias) from calorias group by entrenamiento_identrenamiento) 
@@ -2018,7 +2019,7 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
          respuesta.tipo = rows1[0];
          console.log('correcto')
         respuesta.calorias_hoy = rows[0].calorias;
-
+        respuesta.dia = rows[0].dia;
         if(respuesta.calorias_hoy < 500){
           respuesta.calorias_faltantes = 500-parseFloat (respuesta.calorias_hoy)
           respuesta.calorias_mañana = (respuesta.calorias_faltantes)+500
@@ -2104,54 +2105,7 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
     
     
     
-    app.post('/caloriasDiaria/', function(req, res){ // daily
-    
-      /*
-          {
-          "idusuario": 2
-          }
-        */   
-    
-      var entrenamiento = req.body;
-    
-      
-    
-      var sql = `select u.sexo , u.edad, u.peso, u.altura from entrenamiento e, usuario u 
-      where e.identrenamiento = (select identrenamiento from entrenamiento  order by identrenamiento desc  limit 1)
-      and e.usuario_idusuario = ${entrenamiento.idusuario}; 
-       `;
-    
-    
-    
-    mysqlConnection.query(sql,(err, rows,fields)=>{
-    if(!err){
-    
-      let weight = parseInt(rows[0].peso)/2.20462;
-      let age = parseInt(rows[0].edad);
-      let sexo = rows[0].sexo;
-     
-      console.log(rows);
-    /*
-      let alturaarray = rows[0].altura.split(".");
-      let metros = parseInt(altura[0]) * 100;
-    
-      let totalaltura = metros + parseInt(altura[1]);
-    
-    
-      console.log(totalaltura);
-    */
-     
-    
-    
-    
-    }else{
-    console.log(err);
-    res.json( [{"estado":0}] );
-    }
-    });
-    
-      
-    });
+
 
     app.post('/prue/', function(req, res){/*
       ● Medición final de vo2 max.*/
@@ -2231,7 +2185,7 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
     
       var usuario = req.body;
   
-        var sql = "select cast(fecha as char) as fecha, peso from peso where usuario_idusuario = "+usuario.idusuario;
+        var sql = "select distinct cast(fecha as char) as fecha, peso from peso where usuario_idusuario = "+parseInt(usuario.idusuario) ;
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
 
@@ -2274,7 +2228,7 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
     
       var usuario = req.body;
   
-        var sql ="select a.calorias, a.hora as fecha from (select  cantidad as calorias , idcalorias, cast(fecha as time) as hora from calorias where cantidad > 0 and entrenamiento_identrenamiento = (select identrenamiento as ultimoid  from entrenamiento  order by identrenamiento desc  limit 1) order by idcalorias desc  limit 10) as a order by a.idcalorias asc;";
+        var sql ="select round(a.calorias,2) as calorias, a.hora as fecha from (select  cantidad as calorias , idcalorias, cast(fecha as time) as hora       from calorias where cantidad > 0     order by idcalorias desc  limit 10) as a order by a.idcalorias asc;";
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
 
