@@ -18,7 +18,7 @@ var mysqlConnection = mysql1.createConnection({
   password: "arquipractica1",
   database: "mydb"
 
-  /*user: "root",
+ /* user: "root",
   password: "password",
   database: "mydb"*/
 
@@ -1945,6 +1945,7 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
       var entrenamiento = req.body;
     
       var respuesta = {
+        pesoMeta: '',
         dia: '',
         calorias_hoy: 0,
         calorias_faltantes: 0,
@@ -1982,7 +1983,7 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
       entrenamiento on calorias.entrenamiento_identrenamiento = entrenamiento.identrenamiento
        where calorias.idcalorias in 
       (select  max(idcalorias) from calorias group by entrenamiento_identrenamiento) 
-      and date(calorias.fecha) = date(now())
+      and date(calorias.fecha) = date(DATE_SUB(now(), INTERVAL 6 HOUR))
       and entrenamiento.usuario_idusuario = ${entrenamiento.idusuario}
       order by calorias.idcalorias ; `;
     
@@ -2007,7 +2008,8 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
         when minute(final.promedio_tiempo) > 30 and minute(final.promedio_tiempo) < 40 and hour(final.promedio_tiempo) < 1 then 1.375
         when minute(final.promedio_tiempo) > 40 and minute(final.promedio_tiempo) < 59 and hour(final.promedio_tiempo) < 1 then 1.55
         when hour(final.promedio_tiempo) > 0 then 1.725
-        end) as cantidad_factor_actividad
+        end) as cantidad_factor_actividad,
+        p.peso as peso
         from
         (select cast(SEC_TO_TIME(avg(time_to_sec(ta.tiempo))) as time) promedio_tiempo from
         (select mi.ff as fecha,  SEC_TO_TIME(sum(time_to_sec(timediff(ma.f,mi.f)))) as tiempo from
@@ -2017,7 +2019,8 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
         group by entrenamiento_identrenamiento,cast(fecha as date)) as ma
         where mi.e = ma.e
         group by mi.ff , ma.ff
-        order by mi.ff asc) as ta) final;`;
+        order by mi.ff asc) as ta) final , peso as p
+        where idpeso = 1;`;
           console.log(sql1);
         mysqlConnection.query(sql1,(err, rows1,fields)=>{
           if(!err){
@@ -2031,7 +2034,7 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
           respuesta.recetas = receta3;
         }
 
-
+        respuesta.pesoMeta = rows1[0].peso;
          respuesta.tipo = rows1[0];
          console.log('correcto')
         respuesta.calorias_hoy = rows[0].calorias;
@@ -2040,7 +2043,7 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
           respuesta.calorias_faltantes = 500-parseFloat (respuesta.calorias_hoy)
           respuesta.calorias_mañana = (respuesta.calorias_faltantes)+500
         }
-        
+        console.log(respuesta.dia);
         res.json( respuesta );
           
         }else{
@@ -2191,6 +2194,31 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
         });
     });
 
+    app.post('/pesoMeta/', function(req, res){/*Usuario agrega su peso*/
+  
+      /*
+        {
+        "idusuario": 2,
+        "peso": 150.2
+        }
+        */
+    
+      var usuario = req.body;
+
+            var sql1 = "update peso set peso = "+parseFloat( usuario.peso)+" where idpeso=  1;";  
+            console.log(sql1);
+            mysqlConnection.query(sql1,(err, rows1,fields)=>{
+              if(!err){
+                res.json( [{"status":1}] );
+              }else{
+                console.log(err);
+                res.json( [{"status":0}] );
+              }
+            });
+
+
+    });
+
     app.post('/pesoReporte/', function(req, res){ //velocidad en tiempo real
 
       /*
@@ -2201,7 +2229,7 @@ app.post('/ultimoEntrenamiento/', function(req, res){/*Verificar el estado del u
     
       var usuario = req.body;
   
-        var sql = "select  dayname(fecha) as fecha, min(peso) as peso from peso where usuario_idusuario = "+parseInt(usuario.idusuario)+" group by  dayname(fecha)" ;
+        var sql = "select  dayname(fecha) as fecha, min(peso) as peso from peso where idpeso > 1 usuario_idusuario = "+parseInt(usuario.idusuario)+" group by  dayname(fecha)" ;
         console.log(sql);
         mysqlConnection.query(sql,(err, rows,fields)=>{
 
